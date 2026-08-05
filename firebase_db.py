@@ -48,15 +48,15 @@ class DatabaseManager:
                     "id": "global_settings",
                     "shop_name": "ElectroIMS",
                     "shop_tagline": "Electronics Shop & Repair Hub",
-                    "shop_phone": "9849284991",
-                    "shop_address": "Kathmandu, Nepal"
+                    "shop_phone": "01700000000",
+                    "shop_address": "Dhaka, Bangladesh"
                 },
                 "users": [
                     {
                         "id": "54",
                         "fullname": "Shawon Sarwar",
-                        "location": "Pokhara",
-                        "phone": "9849284991",
+                        "location": "Dhaka",
+                        "phone": "01700000000",
                         "username": "user4",
                         "password": "user4",
                         "category": "ADMINISTRATOR"
@@ -89,8 +89,8 @@ class DatabaseManager:
             "id": "global_settings",
             "shop_name": "ElectroIMS",
             "shop_tagline": "Electronics Shop & Repair Hub",
-            "shop_phone": "9849284991",
-            "shop_address": "Kathmandu, Nepal"
+            "shop_phone": "01700000000",
+            "shop_address": "Dhaka, Bangladesh"
         }
         if self.use_firebase:
             doc = self.db.collection('settings').document('global_settings').get()
@@ -208,7 +208,7 @@ class DatabaseManager:
         self.add_doc('customers', {
             'customercode': ccode,
             'fullname': cname,
-            'location': 'Local Counter',
+            'location': 'Dhaka',
             'phone': phone or 'N/A'
         })
 
@@ -226,7 +226,7 @@ class DatabaseManager:
         self.add_doc('suppliers', {
             'suppliercode': scode,
             'fullname': sname,
-            'location': 'Local Market',
+            'location': 'Dhaka',
             'phone': 'N/A'
         })
 

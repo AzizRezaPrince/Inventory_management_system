@@ -29,7 +29,7 @@
                     <th>Product</th>
                     <th>Customer</th>
                     <th>Quantity</th>
-                    <th>Total Price</th>
+                    <th>Total Price (Tk)</th>
                     <th>Sold By</th>
                     <th>Action</th>
                 </tr>
@@ -65,7 +65,7 @@
                         <strong>{{ cname }}</strong>
                     </td>
                     <td><span class="badge badge-received">{{ sale.quantity }} units</span></td>
-                    <td><strong style="color: var(--accent-emerald); font-size: 1rem;">Rs {{ "%.2f"|format(sale.revenue) }}</strong></td>
+                    <td><strong style="color: var(--accent-emerald); font-size: 1rem;">Tk {{ "%.2f"|format(sale.revenue) }}</strong></td>
                     <td>{{ sale.soldby }}</td>
                     <td>
                         <button class="btn btn-secondary btn-sm" onclick="printSalesReceipt('{{ sale.id }}', '{{ sale.date }}', '{{ sale.productcode }}', '{{ pname }}', '{{ cname }}', '{{ sale.customercode }}', '{{ sale.quantity }}', '{{ unit_price }}', '{{ sale.revenue }}', '{{ sale.soldby }}')">
@@ -96,7 +96,7 @@
                 <select name="productcode" id="saleProduct" class="form-select" onchange="updateLiveSalePrice()" required>
                     {% for p in products %}
                         <option value="{{ p.productcode }}" data-price="{{ p.sellingprice }}" data-stock="{{ p.quantity }}">
-                            {{ p.productname }} — Rs {{ "%.2f"|format(p.sellingprice) }} (Stock: {{ p.quantity }})
+                            {{ p.productname }} — Tk {{ "%.2f"|format(p.sellingprice) }} (Stock: {{ p.quantity }})
                         </option>
                     {% else %}
                         <option value="" disabled selected>No products in inventory yet!</option>
@@ -124,7 +124,7 @@
             <!-- Live Calculated Total Box -->
             <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 1rem; margin-top: 1rem; text-align: center;">
                 <span style="color: var(--text-muted); font-size: 0.85rem;">Total Payable Amount:</span>
-                <div id="liveTotalDisplay" style="font-size: 1.5rem; font-weight: 700; color: var(--accent-emerald); margin-top: 2px;">Rs 0.00</div>
+                <div id="liveTotalDisplay" style="font-size: 1.5rem; font-weight: 700; color: var(--accent-emerald); margin-top: 2px;">Tk 0.00</div>
             </div>
 
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
@@ -165,7 +165,7 @@ function updateLiveSalePrice() {
         const price = parseFloat(option.getAttribute('data-price') || 0);
         const qty = parseInt(qtyInput.value || 1);
         const total = price * qty;
-        display.innerText = 'Rs ' + total.toFixed(2);
+        display.innerText = 'Tk ' + total.toFixed(2);
     }
 }
 document.addEventListener('DOMContentLoaded', updateLiveSalePrice);

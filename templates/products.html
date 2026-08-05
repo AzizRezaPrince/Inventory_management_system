@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Product Inventory - ElectroIMS{% endblock %}
+{% block title %}Product Inventory - {{ shop_settings.shop_name }}{% endblock %}
 
 {% block content %}
 <div class="top-bar">
@@ -30,8 +30,8 @@
                     <th>Code</th>
                     <th>Product Name</th>
                     <th>Brand</th>
-                    <th>Cost Price</th>
-                    <th>Selling Price</th>
+                    <th>Cost Price (Tk)</th>
+                    <th>Selling Price (Tk)</th>
                     <th>In Stock Qty</th>
                     <th>Actions</th>
                 </tr>
@@ -42,8 +42,8 @@
                     <td><code>{{ p.productcode }}</code></td>
                     <td><strong>{{ p.productname }}</strong></td>
                     <td>{{ p.brand }}</td>
-                    <td>Rs {{ "%.2f"|format(p.costprice) }}</td>
-                    <td>Rs {{ "%.2f"|format(p.sellingprice) }}</td>
+                    <td>Tk {{ "%.2f"|format(p.costprice) }}</td>
+                    <td>Tk {{ "%.2f"|format(p.sellingprice) }}</td>
                     <td>
                         {% if p.quantity < 5 %}
                             <span class="badge badge-diagnosing" style="background: rgba(244,63,94,0.15); color: var(--accent-rose);">{{ p.quantity }} units</span>
@@ -69,7 +69,7 @@
                 {% else %}
                 <tr>
                     <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                        No products found in inventory catalog.
+                        No products found in inventory catalog. Click Add New Product to create one!
                     </td>
                 </tr>
                 {% endfor %}
@@ -91,11 +91,11 @@
             <div class="form-grid-2">
                 <div class="form-group">
                     <label class="form-label">Product Code</label>
-                    <input type="text" name="productcode" class="form-control" placeholder="e.g. prod10" required>
+                    <input type="text" name="productcode" class="form-control" placeholder="e.g. prod10">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Brand</label>
-                    <input type="text" name="brand" class="form-control" placeholder="e.g. Samsung / CG" required>
+                    <input type="text" name="brand" class="form-control" placeholder="e.g. Samsung / Walton / General">
                 </div>
             </div>
 
@@ -106,11 +106,11 @@
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Cost Price (Rs)</label>
+                    <label class="form-label">Cost Price (Tk)</label>
                     <input type="number" step="0.01" name="costprice" class="form-control" placeholder="0.00" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Selling Price (Rs)</label>
+                    <label class="form-label">Selling Price (Tk)</label>
                     <input type="number" step="0.01" name="sellingprice" class="form-control" placeholder="0.00" required>
                 </div>
             </div>
@@ -157,11 +157,11 @@
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Cost Price (Rs)</label>
+                    <label class="form-label">Cost Price (Tk)</label>
                     <input type="number" step="0.01" name="costprice" id="editCost" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Selling Price (Rs)</label>
+                    <label class="form-label">Selling Price (Tk)</label>
                     <input type="number" step="0.01" name="sellingprice" id="editSell" class="form-control" required>
                 </div>
             </div>

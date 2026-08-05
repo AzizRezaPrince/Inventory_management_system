@@ -23,7 +23,6 @@ function openModal(modalId) {
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.classList.remove('remove');
         modal.classList.remove('active');
     }
 }
@@ -48,14 +47,14 @@ function filterTable(inputId, tableId) {
     }
 }
 
-// Repair Receipt Modal Printer with Dynamic Shop Settings
+// Repair Receipt Modal Printer with Dynamic Shop Settings (Bangladeshi Taka)
 function printRepairReceipt(id, customer, phone, device, problem, cost, advance, status, delivery, date) {
     const balance = (parseFloat(cost) - parseFloat(advance)).toFixed(2);
     const shop = window.SHOP_SETTINGS || {
         name: 'ElectroIMS',
         tagline: 'Electronics Shop & Repair Hub',
-        phone: '9849284991',
-        address: 'Kathmandu, Nepal'
+        phone: '01700000000',
+        address: 'Dhaka, Bangladesh'
     };
 
     const receiptHTML = `
@@ -84,19 +83,19 @@ function printRepairReceipt(id, customer, phone, device, problem, cost, advance,
             <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
                 <tr style="background: #f0f0f0;">
                     <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Item / Description</th>
-                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Amount (Rs)</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Amount (Tk)</th>
                 </tr>
                 <tr>
                     <td style="padding: 8px; border: 1px solid #ddd;">Repair Labor & Replacement Parts Charge</td>
-                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${parseFloat(cost).toFixed(2)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Tk ${parseFloat(cost).toFixed(2)}</td>
                 </tr>
                 <tr>
                     <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Advance Paid Deposit</td>
-                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: green; font-weight: bold;">-${parseFloat(advance).toFixed(2)}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: green; font-weight: bold;">-Tk ${parseFloat(advance).toFixed(2)}</td>
                 </tr>
                 <tr style="background: #f9f9f9;">
                     <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1rem;">Balance Due at Delivery</td>
-                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1rem; color: red;">Rs ${balance}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1rem; color: red;">Tk ${balance}</td>
                 </tr>
             </table>
 
@@ -124,13 +123,13 @@ function printRepairReceipt(id, customer, phone, device, problem, cost, advance,
     }
 }
 
-// Product Sales Cash Memo Invoice Printer
+// Product Sales Cash Memo Invoice Printer (Bangladeshi Taka)
 function printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPrice, revenue, soldBy) {
     const shop = window.SHOP_SETTINGS || {
         name: 'ElectroIMS',
         tagline: 'Electronics Shop & Repair Hub',
-        phone: '9849284991',
-        address: 'Kathmandu, Nepal'
+        phone: '01700000000',
+        address: 'Dhaka, Bangladesh'
     };
 
     const receiptHTML = `
@@ -160,19 +159,19 @@ function printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPr
                         <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Product Item</th>
                         <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Qty</th>
                         <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Unit Price</th>
-                        <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total (Rs)</th>
+                        <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total (Tk)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td style="padding: 8px; border: 1px solid #ddd;">${pname} <br><small style="color:#666;">Code: ${pcode}</small></td>
                         <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${qty}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Rs ${parseFloat(unitPrice).toFixed(2)}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold;">Rs ${parseFloat(revenue).toFixed(2)}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Tk ${parseFloat(unitPrice).toFixed(2)}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold;">Tk ${parseFloat(revenue).toFixed(2)}</td>
                     </tr>
                     <tr style="background: #f9f9f9;">
                         <td colspan="3" style="padding: 10px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1rem;">Total Net Amount Paid:</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1.1rem; color: #10b981;">Rs ${parseFloat(revenue).toFixed(2)}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1.1rem; color: #10b981;">Tk ${parseFloat(revenue).toFixed(2)}</td>
                     </tr>
                 </tbody>
             </table>

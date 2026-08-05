@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Electronics Repair Services - ElectroIMS{% endblock %}
+{% block title %}Electronics Repair Services - {{ shop_settings.shop_name }}{% endblock %}
 
 {% block content %}
 <div class="top-bar">
@@ -50,11 +50,11 @@
                         <strong>{{ r.device_type }}</strong> - {{ r.brand_model }}<br>
                         <small style="color: var(--text-muted);">Problem: {{ r.issue_description }}</small>
                     </td>
-                    <td>Rs {{ "%.2f"|format(r.estimated_cost) }}</td>
+                    <td>Tk {{ "%.2f"|format(r.estimated_cost) }}</td>
                     <td>
-                        <span style="color: var(--accent-emerald);">Paid: Rs {{ "%.2f"|format(r.advance_paid) }}</span><br>
+                        <span style="color: var(--accent-emerald);">Paid: Tk {{ "%.2f"|format(r.advance_paid) }}</span><br>
                         <small style="color: {% if balance > 0 %}var(--accent-rose){% else %}var(--text-muted){% endif %}; font-weight: bold;">
-                            Due: Rs {{ "%.2f"|format(balance) }}
+                            Due: Tk {{ "%.2f"|format(balance) }}
                         </small>
                     </td>
                     <td>
@@ -116,11 +116,11 @@
             <div class="form-grid-2">
                 <div class="form-group">
                     <label class="form-label">Customer Name</label>
-                    <input type="text" name="customer_name" class="form-control" placeholder="e.g. Anil Sharma" required>
+                    <input type="text" name="customer_name" class="form-control" placeholder="e.g. Rahim Ahmed" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Customer Phone</label>
-                    <input type="text" name="customer_phone" class="form-control" placeholder="e.g. 9812345678" required>
+                    <input type="text" name="customer_phone" class="form-control" placeholder="e.g. 01700000000" required>
                 </div>
             </div>
 
@@ -154,11 +154,11 @@
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Estimated Repair Cost (Rs)</label>
+                    <label class="form-label">Estimated Repair Cost (Tk)</label>
                     <input type="number" step="0.01" name="estimated_cost" class="form-control" placeholder="0.00" value="0">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Advance Deposit Paid (Rs)</label>
+                    <label class="form-label">Advance Deposit Paid (Tk)</label>
                     <input type="number" step="0.01" name="advance_paid" class="form-control" placeholder="0.00" value="0">
                 </div>
             </div>
@@ -208,11 +208,11 @@
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Add Additional Cost / Parts Charge (Rs)</label>
+                    <label class="form-label">Add Additional Cost / Parts Charge (Tk)</label>
                     <input type="number" step="0.01" name="additional_cost" class="form-control" value="0">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Add Payment Received (Rs)</label>
+                    <label class="form-label">Add Payment Received (Tk)</label>
                     <input type="number" step="0.01" name="additional_paid" class="form-control" value="0">
                 </div>
             </div>

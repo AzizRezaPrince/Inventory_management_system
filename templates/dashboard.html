@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - ElectroIMS{% endblock %}
+{% block title %}Dashboard - {{ shop_settings.shop_name }}{% endblock %}
 
 {% block content %}
 <div class="top-bar">
@@ -52,7 +52,7 @@
             <i class="fa-solid fa-receipt"></i>
         </div>
         <div class="metric-details">
-            <h3>Rs {{ "%.2f"|format(total_revenue) }}</h3>
+            <h3>Tk {{ "%.2f"|format(total_revenue) }}</h3>
             <p>Total Sales Revenue</p>
         </div>
     </div>
@@ -94,7 +94,7 @@
                                 <span class="badge badge-delivered">{{ r.status }}</span>
                             {% endif %}
                         </td>
-                        <td>Rs {{ "%.2f"|format(r.estimated_cost) }}</td>
+                        <td>Tk {{ "%.2f"|format(r.estimated_cost) }}</td>
                     </tr>
                     {% else %}
                     <tr>
