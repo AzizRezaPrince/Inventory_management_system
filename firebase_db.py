@@ -57,11 +57,14 @@ class DatabaseManager:
                 try:
                     if not firebase_admin._apps:
                         firebase_admin.initialize_app(cred)
-                    self.db = firestore.client()
+                    client = firestore.client()
+                    # Perform a test read to verify Firestore database permissions
+                    client.collection('_healthcheck').document('test').get()
+                    self.db = client
                     self.use_firebase = True
-                    print("Connected to Firebase Firestore!")
+                    print("Connected to Firebase Firestore successfully!")
                 except Exception as e:
-                    print(f"Firebase initialization warning: {e}. Falling back to Local NoSQL engine.")
+                    print(f"Firebase Firestore permission/connection warning: {e}. Falling back to Local NoSQL engine.")
                     self.use_firebase = False
         
         if not self.use_firebase:
@@ -123,20 +126,23 @@ class DatabaseManager:
             "shop_address": "Dhaka, Bangladesh"
         }
         if self.use_firebase:
-            doc = self.db.collection('settings').document('global_settings').get()
-            if doc.exists:
-                res = doc.to_dict()
-                default_settings.update(res)
-                return default_settings
-            else:
-                self.db.collection('settings').document('global_settings').set(default_settings)
-                return default_settings
-        else:
-            data = self._read_local()
-            if 'settings' not in data:
-                data['settings'] = default_settings
-                self._write_local(data)
-            return data.get('settings', default_settings)
+            try:
+                doc = self.db.collection('settings').document('global_settings').get()
+                if doc.exists:
+                    res = doc.to_dict()
+                    default_settings.update(res)
+                    return default_settings
+                else:
+                    self.db.collection('settings').document('global_settings').set(default_settings)
+                    return default_settings
+            except Exception as e:
+                print(f"Firestore get_settings error: {e}. Falling back to local DB.")
+        
+        data = self._read_local()
+        if 'settings' not in data:
+            data['settings'] = default_settings
+            self._write_local(data)
+        return data.get('settings', default_settings)
 
     def update_settings(self, updates):
         if self.use_firebase:
