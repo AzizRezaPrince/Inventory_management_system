@@ -74,7 +74,7 @@ function printRepairReceipt(id, customer, phone, device, problem, cost, advance,
             <hr style="border: 0.5px solid #ccc; margin-bottom: 12px;">
             
             <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${customer}</p>
-            <p style="margin: 4px 0;"><strong>Contact Phone:</strong> ${phone}</p>
+            <p style="margin: 4px 0;"><strong>Contact Phone:</strong> ${phone || 'N/A'}</p>
             <p style="margin: 4px 0;"><strong>Device Item:</strong> ${device}</p>
             <p style="margin: 4px 0;"><strong>Reported Issue:</strong> ${problem}</p>
             <p style="margin: 4px 0;"><strong>Est. Delivery Date:</strong> ${delivery || 'TBD'}</p>

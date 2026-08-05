@@ -68,7 +68,18 @@
                     <td><strong style="color: var(--accent-emerald); font-size: 1rem;">Tk {{ "%.2f"|format(sale.revenue) }}</strong></td>
                     <td>{{ sale.soldby }}</td>
                     <td>
-                        <button class="btn btn-secondary btn-sm" onclick="printSalesReceipt('{{ sale.id }}', '{{ sale.date }}', '{{ sale.productcode }}', '{{ pname }}', '{{ cname }}', '{{ sale.customercode }}', '{{ sale.quantity }}', '{{ unit_price }}', '{{ sale.revenue }}', '{{ sale.soldby }}')">
+                        <button class="btn btn-secondary btn-sm"
+                            data-id="{{ sale.id }}"
+                            data-date="{{ sale.date }}"
+                            data-pcode="{{ sale.productcode }}"
+                            data-pname="{{ pname }}"
+                            data-cname="{{ cname }}"
+                            data-ccode="{{ sale.customercode }}"
+                            data-qty="{{ sale.quantity }}"
+                            data-unitprice="{{ unit_price }}"
+                            data-revenue="{{ sale.revenue }}"
+                            data-soldby="{{ sale.soldby }}"
+                            onclick="triggerSalesPrint(this)">
                             <i class="fa-solid fa-print"></i> Print Receipt
                         </button>
                     </td>
@@ -155,6 +166,20 @@
 
 {% block scripts %}
 <script>
+function triggerSalesPrint(btn) {
+    const saleId = btn.getAttribute('data-id');
+    const date = btn.getAttribute('data-date');
+    const pcode = btn.getAttribute('data-pcode');
+    const pname = btn.getAttribute('data-pname');
+    const cname = btn.getAttribute('data-cname');
+    const ccode = btn.getAttribute('data-ccode');
+    const qty = btn.getAttribute('data-qty');
+    const unitPrice = btn.getAttribute('data-unitprice');
+    const revenue = btn.getAttribute('data-revenue');
+    const soldBy = btn.getAttribute('data-soldby');
+    printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPrice, revenue, soldBy);
+}
+
 function updateLiveSalePrice() {
     const select = document.getElementById('saleProduct');
     const qtyInput = document.getElementById('saleQty');

@@ -44,10 +44,10 @@
                     <td><strong>{{ r.id }}</strong></td>
                     <td>
                         <strong>{{ r.customer_name }}</strong><br>
-                        <small style="color: var(--text-muted);"><i class="fa-solid fa-phone"></i> {{ r.customer_phone }}</small>
+                        <small style="color: var(--text-muted);"><i class="fa-solid fa-phone"></i> {{ r.customer_phone or 'N/A' }}</small>
                     </td>
                     <td>
-                        <strong>{{ r.device_type }}</strong> - {{ r.brand_model }}<br>
+                        <strong>{{ r.device_type }}</strong> - {{ r.brand_model or 'General' }}<br>
                         <small style="color: var(--text-muted);">Problem: {{ r.issue_description }}</small>
                     </td>
                     <td>Tk {{ "%.2f"|format(r.estimated_cost) }}</td>
@@ -75,10 +75,28 @@
                     <td>{{ r.estimated_delivery or 'Not set' }}</td>
                     <td>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-secondary btn-sm" onclick="printRepairReceipt('{{ r.id }}', '{{ r.customer_name }}', '{{ r.customer_phone }}', '{{ r.device_type }} - {{ r.brand_model }}', '{{ r.issue_description }}', '{{ r.estimated_cost }}', '{{ r.advance_paid }}', '{{ r.status }}', '{{ r.estimated_delivery }}', '{{ r.created_at }}')" title="Print Service Receipt">
+                            <button class="btn btn-secondary btn-sm"
+                                data-id="{{ r.id }}"
+                                data-customer="{{ r.customer_name }}"
+                                data-phone="{{ r.customer_phone }}"
+                                data-device="{{ r.device_type }} - {{ r.brand_model }}"
+                                data-issue="{{ r.issue_description }}"
+                                data-cost="{{ r.estimated_cost }}"
+                                data-advance="{{ r.advance_paid }}"
+                                data-status="{{ r.status }}"
+                                data-delivery="{{ r.estimated_delivery }}"
+                                data-created="{{ r.created_at }}"
+                                onclick="triggerRepairPrint(this)"
+                                title="Print Service Receipt">
                                 <i class="fa-solid fa-print"></i>
                             </button>
-                            <button class="btn btn-primary btn-sm" onclick="openUpdateModal('{{ r.id }}', '{{ r.status }}', '{{ r.estimated_cost }}', '{{ r.advance_paid }}')" title="Update Status & Billing">
+                            <button class="btn btn-primary btn-sm"
+                                data-id="{{ r.id }}"
+                                data-status="{{ r.status }}"
+                                data-cost="{{ r.estimated_cost }}"
+                                data-advance="{{ r.advance_paid }}"
+                                onclick="triggerUpdateModal(this)"
+                                title="Update Status & Billing">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
                             <form action="{{ url_for('repairs') }}" method="POST" onsubmit="return confirm('Delete repair ticket {{ r.id }}?')" style="display:inline;">
@@ -119,8 +137,8 @@
                     <input type="text" name="customer_name" class="form-control" placeholder="e.g. Rahim Ahmed" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Customer Phone</label>
-                    <input type="text" name="customer_phone" class="form-control" placeholder="e.g. 01700000000" required>
+                    <label class="form-label">Customer Phone (Optional)</label>
+                    <input type="text" name="customer_phone" class="form-control" placeholder="e.g. 01700000000">
                 </div>
             </div>
 
@@ -138,7 +156,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Brand & Model</label>
-                    <input type="text" name="brand_model" class="form-control" placeholder="e.g. Samsung 55 UHD / Asus Laptop" required>
+                    <input type="text" name="brand_model" class="form-control" placeholder="e.g. Samsung 55 UHD / SM 26 ultra">
                 </div>
             </div>
 
@@ -246,7 +264,23 @@
 
 {% block scripts %}
 <script>
-function openUpdateModal(ticketId, currentStatus, currentCost, currentPaid) {
+function triggerRepairPrint(btn) {
+    const id = btn.getAttribute('data-id');
+    const customer = btn.getAttribute('data-customer');
+    const phone = btn.getAttribute('data-phone');
+    const device = btn.getAttribute('data-device');
+    const issue = btn.getAttribute('data-issue');
+    const cost = btn.getAttribute('data-cost');
+    const advance = btn.getAttribute('data-advance');
+    const status = btn.getAttribute('data-status');
+    const delivery = btn.getAttribute('data-delivery');
+    const created = btn.getAttribute('data-created');
+    printRepairReceipt(id, customer, phone, device, issue, cost, advance, status, delivery, created);
+}
+
+function triggerUpdateModal(btn) {
+    const ticketId = btn.getAttribute('data-id');
+    const currentStatus = btn.getAttribute('data-status');
     document.getElementById('upTicketId').value = ticketId;
     document.getElementById('upTicketIdText').innerText = ticketId;
     document.getElementById('upStatus').value = currentStatus;
