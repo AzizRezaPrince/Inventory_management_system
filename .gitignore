@@ -1,0 +1,10 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / Editor Files
+.idea/
+.vscode/
+*.nbworkspace
+nbproject/private/
