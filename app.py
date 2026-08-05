@@ -55,6 +55,10 @@ def admin_required(f):
 
 # --- Routes ---
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route('/')
 def index():
     if 'user_id' in session:
