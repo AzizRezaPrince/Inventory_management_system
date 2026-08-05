@@ -22,19 +22,49 @@ class DatabaseManager:
         self.db = None
         self.local_db_path = os.path.join(os.path.dirname(__file__), 'data', 'db.json')
         
-        # Check for Firebase Service Account Key
-        key_path = os.path.join(os.path.dirname(__file__), 'serviceAccountKey.json')
-        if FIREBASE_AVAILABLE and os.path.exists(key_path):
-            try:
-                cred = credentials.Certificate(key_path)
-                firebase_admin.initialize_app(cred)
-                self.db = firestore.client()
-                self.use_firebase = True
-                print("Connected to Firebase Firestore!")
-            except Exception as e:
-                print(f"Firebase initialization warning: {e}. Falling back to Local NoSQL engine.")
-                self.use_firebase = False
-        else:
+        # Check for Firebase Service Account Key from multiple sources
+        cred = None
+        if FIREBASE_AVAILABLE:
+            # 1. Try Environment Variable (useful for Cloud hosting like Render)
+            env_cred = os.environ.get('FIREBASE_CREDENTIALS')
+            if env_cred:
+                try:
+                    cred_dict = json.loads(env_cred)
+                    cred = credentials.Certificate(cred_dict)
+                except Exception as ex:
+                    print(f"Error loading FIREBASE_CREDENTIALS env var: {ex}")
+
+            # 2. Try standard serviceAccountKey.json or any firebase-adminsdk json file
+            if not cred:
+                base_dir = os.path.dirname(__file__)
+                possible_keys = ['serviceAccountKey.json']
+                try:
+                    possible_keys += [f for f in os.listdir(base_dir) if f.endswith('.json') and 'firebase-adminsdk' in f]
+                except Exception:
+                    pass
+
+                for k_name in possible_keys:
+                    k_path = os.path.join(base_dir, k_name)
+                    if os.path.exists(k_path):
+                        try:
+                            cred = credentials.Certificate(k_path)
+                            print(f"Loaded Firebase key from: {k_name}")
+                            break
+                        except Exception as ex:
+                            print(f"Failed to load key from {k_name}: {ex}")
+
+            if cred:
+                try:
+                    if not firebase_admin._apps:
+                        firebase_admin.initialize_app(cred)
+                    self.db = firestore.client()
+                    self.use_firebase = True
+                    print("Connected to Firebase Firestore!")
+                except Exception as e:
+                    print(f"Firebase initialization warning: {e}. Falling back to Local NoSQL engine.")
+                    self.use_firebase = False
+        
+        if not self.use_firebase:
             print("Running in Local NoSQL Mode (Zero-Install).")
         
         if not self.use_firebase:

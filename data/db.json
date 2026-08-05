@@ -1,19 +1,19 @@
 {
     "settings": {
         "id": "global_settings",
-        "shop_name": "ElectroIMS",
+        "shop_name": "Shawon's Realm",
         "shop_tagline": "Electronics Shop & Repair Hub",
         "shop_phone": "01700000000",
-        "shop_address": "Dhaka, Bangladesh"
+        "shop_address": "Chapainawabganj"
     },
     "users": [
         {
             "id": "54",
             "fullname": "Shawon Sarwar",
-            "location": "Dhaka",
-            "phone": "01700000000",
-            "username": "user4",
-            "password": "user4",
+            "location": "Chapainawabganj",
+            "phone": "0170000000",
+            "username": "admin",
+            "password": "admin",
             "category": "ADMINISTRATOR"
         }
     ],

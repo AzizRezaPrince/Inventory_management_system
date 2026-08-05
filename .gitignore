@@ -8,3 +8,13 @@ Desktop.ini
 .vscode/
 *.nbworkspace
 nbproject/private/
+
+# Firebase & Secret Credentials
+serviceAccountKey.json
+*firebase-adminsdk*.json
+
+# Python & Environment
+__pycache__/
+*.pyc
+.env
+

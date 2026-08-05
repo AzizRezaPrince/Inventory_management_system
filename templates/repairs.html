@@ -40,6 +40,7 @@
             <tbody>
                 {% for r in repairs %}
                 {% set balance = r.estimated_cost - r.advance_paid %}
+                {% set due_color = 'var(--accent-rose)' if balance > 0 else 'var(--text-muted)' %}
                 <tr>
                     <td><strong>{{ r.id }}</strong></td>
                     <td>
@@ -53,7 +54,7 @@
                     <td>Tk {{ "%.2f"|format(r.estimated_cost) }}</td>
                     <td>
                         <span style="color: var(--accent-emerald);">Paid: Tk {{ "%.2f"|format(r.advance_paid) }}</span><br>
-                        <small style="color: {% if balance > 0 %}var(--accent-rose){% else %}var(--text-muted){% endif %}; font-weight: bold;">
+                        <small style="color: {{ due_color }}; font-weight: bold;">
                             Due: Tk {{ "%.2f"|format(balance) }}
                         </small>
                     </td>
