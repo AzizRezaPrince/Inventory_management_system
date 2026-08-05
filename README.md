@@ -1,52 +1,66 @@
-# Inventory Management System for Electronics Shop
+# Electronics Shop Inventory & Repair Management System
 
-A Java-based Desktop Application for managing stock, products, suppliers, customers, and sales reports for electronics shops.
-
-## 🚀 Features
-
-- **Product Management**: Add, update, and track items and stock levels.
-- **Supplier & Customer Tracking**: Keep records of suppliers and customer info.
-- **Purchase & Sales Reports**: Log stock intake and generate sales reports.
-- **User Role Access**: Admin and user login authentication.
+A modern **Python Flask Web Application** powered by **Firebase NoSQL (Firestore / Realtime Database)** designed specifically for Electronics Sales, Component Inventory, and Repair Service Shops (TVs, Laptops, Computers, Smartphones & Component Repair).
 
 ---
 
-## 🛠️ Project Structure
+## ⚡ Key Features
 
-```text
-├── InventoryMangagementSystem.jar   # Main executable application
-├── run.bat                          # One-click Windows launcher script
-├── ims.sql                          # Database dump (MySQL)
-├── README.TXT                       # Original build instructions
-└── lib/                             # Required Java dependency libraries
-    ├── AbsoluteLayout.jar
-    ├── JTattoo-1.6.10.jar
-    ├── jcalendar-1.4.jar
-    └── mysql-connector-java-5.1.23-bin.jar
-```
+- **🔧 Electronics Repair & Service Management**:
+  - Track repair tickets for Smart TVs, Laptops, Computers, Smartphones, and Components.
+  - Track Customer info, Problem descriptions, Serial numbers, and Assigned Technicians.
+  - Track Estimated Repair Costs, Advance Payments, and Balance Due.
+  - Real-time status workflow (`Received`, `Diagnosing`, `In Progress`, `Waiting for Parts`, `Ready for Pickup`, `Delivered`).
+  - **Printable Service Receipts** for customers.
+
+- **📦 Product Inventory & Stock Management**:
+  - Catalogue electronics products and spare parts with cost and selling prices.
+  - Low stock warning alerts (< 5 units).
+
+- **🛒 Sales & Purchase Intake**:
+  - Log wholesale stock intake from suppliers.
+  - Process customer sales with automatic stock deduction and revenue analytics.
+
+- **👥 Supplier & Customer Directories**:
+  - Keep full contact directories for suppliers and customers.
+
+- **🛡️ Multi-Role Security & Admin Panel**:
+  - Session authentication with `ADMINISTRATOR` and `STAFF / TECHNICIAN` roles.
+
+- **🔥 Hybrid Firebase / Offline NoSQL Engine**:
+  - Connects to **Firebase Firestore** when `serviceAccountKey.json` is provided.
+  - Seamlessly falls back to an offline local NoSQL engine for zero-install, out-of-the-box local operation.
 
 ---
 
-## 📋 How to Run
+## 🚀 How to Run (1-Click)
 
-### Option 1: Quick Launch (Windows)
-Double-click `run.bat` or run:
+### Quick Start on Windows
+Simply double-click [`run_flask.bat`](file:///d:/SHawon%20Bhaiya%20Soft/IMSsoft/run_flask.bat). It will start the server and automatically open `http://127.0.0.1:5000` in your browser.
+
+### Manual Command Line Start
 ```cmd
-run.bat
+cd /d "D:\SHawon Bhaiya Soft\IMSsoft"
+pip install -r requirements.txt
+python app.py
 ```
 
-### Option 2: Command Line
-```cmd
-java -jar "InventoryMangagementSystem.jar"
-```
+Open `http://127.0.0.1:5000` in your web browser.
 
 ---
 
-## 🗄️ Database Setup
+## 🔑 Default Login Credentials
 
-1. Start your local **MySQL Server** (via XAMPP, WAMP, or standalone MySQL).
-2. Create a database named `ims`.
-3. Import `ims.sql` into the `ims` database.
-4. **Default Admin Login**:
-   - **Username**: `user4`
-   - **Category**: `ADMINISTRATOR`
+- **Username**: `user4`
+- **Password**: `user4`
+- **Category**: `ADMINISTRATOR`
+
+---
+
+## 🔥 Firebase Setup (Optional)
+
+To connect to a live Firebase project:
+1. Go to [Firebase Console](https://console.firebase.google.com/).
+2. Create a project and download your **Service Account Key JSON**.
+3. Save the file as `serviceAccountKey.json` inside this root project folder (`D:\SHawon Bhaiya Soft\IMSsoft\serviceAccountKey.json`).
+4. Restart the app (`run_flask.bat`). It will automatically connect to Firebase Firestore!

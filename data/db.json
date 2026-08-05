@@ -1,0 +1,27 @@
+{
+    "settings": {
+        "id": "global_settings",
+        "shop_name": "ElectroIMS",
+        "shop_tagline": "Electronics Shop & Repair Hub",
+        "shop_phone": "9849284991",
+        "shop_address": "Kathmandu, Nepal"
+    },
+    "users": [
+        {
+            "id": "54",
+            "fullname": "Shawon Sarwar",
+            "location": "Pokhara",
+            "phone": "9849284991",
+            "username": "user4",
+            "password": "user4",
+            "category": "ADMINISTRATOR"
+        }
+    ],
+    "products": [],
+    "currentstocks": [],
+    "suppliers": [],
+    "customers": [],
+    "purchaseinfo": [],
+    "salesreport": [],
+    "repairs": []
+}

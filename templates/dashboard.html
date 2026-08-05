@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ElectroIMS{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div>
+        <h1 class="page-title">Electronics Shop Dashboard</h1>
+        <p class="page-subtitle">Welcome back, {{ session.get('fullname') }}! Here is your real-time shop summary.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('repairs') }}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> New Repair Job
+        </a>
+    </div>
+</div>
+
+<!-- Key Metrics Grid -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-icon purple">
+            <i class="fa-solid fa-wrench"></i>
+        </div>
+        <div class="metric-details">
+            <h3>{{ pending_repair_count }}</h3>
+            <p>Active Repair Jobs</p>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon blue">
+            <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <div class="metric-details">
+            <h3>{{ total_products }}</h3>
+            <p>Product Types</p>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon amber">
+            <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div class="metric-details">
+            <h3>{{ total_stock_count }}</h3>
+            <p>Total Stock Items</p>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon emerald">
+            <i class="fa-solid fa-receipt"></i>
+        </div>
+        <div class="metric-details">
+            <h3>Rs {{ "%.2f"|format(total_revenue) }}</h3>
+            <p>Total Sales Revenue</p>
+        </div>
+    </div>
+</div>
+
+<!-- Active Repairs & Low Stock Grid -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <!-- Active Repairs Summary -->
+    <div class="content-card">
+        <div class="card-header-actions">
+            <h2 class="card-title"><i class="fa-solid fa-screwdriver-wrench" style="color: var(--accent-purple);"></i> Recent Electronics Repairs</h2>
+            <a href="{{ url_for('repairs') }}" class="btn btn-secondary btn-sm">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticket</th>
+                        <th>Device</th>
+                        <th>Status</th>
+                        <th>Est. Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in active_repairs %}
+                    <tr>
+                        <td><strong>{{ r.id }}</strong></td>
+                        <td>{{ r.device_type }}<br><small style="color:var(--text-muted);">{{ r.brand_model }}</small></td>
+                        <td>
+                            {% if r.status == 'Received' %}
+                                <span class="badge badge-received">Received</span>
+                            {% elif r.status == 'Diagnosing' %}
+                                <span class="badge badge-diagnosing">Diagnosing</span>
+                            {% elif r.status == 'In Progress' %}
+                                <span class="badge badge-in-progress">In Progress</span>
+                            {% elif r.status == 'Ready for Delivery' %}
+                                <span class="badge badge-ready">Ready</span>
+                            {% else %}
+                                <span class="badge badge-delivered">{{ r.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>Rs {{ "%.2f"|format(r.estimated_cost) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted);">No active repair jobs.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Low Stock Inventory Alert -->
+    <div class="content-card">
+        <div class="card-header-actions">
+            <h2 class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-amber);"></i> Low Stock Alerts (< 5 Qty)</h2>
+            <a href="{{ url_for('products') }}" class="btn btn-secondary btn-sm">Manage Inventory</a>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Product Name</th>
+                        <th>Brand</th>
+                        <th>In Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in low_stock_list %}
+                    <tr>
+                        <td><code>{{ item.code }}</code></td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.brand }}</td>
+                        <td>
+                            <span class="badge badge-diagnosing" style="background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border-color: rgba(244, 63, 94, 0.3);">
+                                {{ item.quantity }} units left
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--accent-emerald);">All product stocks are healthy!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

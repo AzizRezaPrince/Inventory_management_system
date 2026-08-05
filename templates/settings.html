@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Settings & Profile - {{ shop_settings.shop_name }}{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div>
+        <h1 class="page-title">Settings & Profile Management</h1>
+        <p class="page-subtitle">Configure project/shop branding, phone numbers, and administrator profile information.</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+
+    <!-- Card 1: Shop & Project Branding Settings (Admin Only) -->
+    <div class="content-card">
+        <div class="card-header-actions">
+            <h2 class="card-title">
+                <i class="fa-solid fa-store" style="color: var(--accent-blue);"></i> Shop & Project Branding
+            </h2>
+        </div>
+
+        {% if session.get('category') == 'ADMINISTRATOR' %}
+        <form action="{{ url_for('settings') }}" method="POST">
+            <input type="hidden" name="action" value="update_shop_settings">
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-heading"></i> Project / Shop Name</label>
+                <input type="text" name="shop_name" class="form-control" value="{{ shop_settings.shop_name }}" placeholder="e.g. ElectroIMS / Shawon Electronics" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-tag"></i> Shop Tagline / Subtitle</label>
+                <input type="text" name="shop_tagline" class="form-control" value="{{ shop_settings.shop_tagline }}" placeholder="e.g. Shop & Repair Hub" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-phone"></i> Shop Phone (Appears on Receipts)</label>
+                <input type="text" name="shop_phone" class="form-control" value="{{ shop_settings.shop_phone }}" placeholder="e.g. 9849284991" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-location-dot"></i> Shop Address (Appears on Receipts)</label>
+                <input type="text" name="shop_address" class="form-control" value="{{ shop_settings.shop_address }}" placeholder="e.g. Kathmandu, Nepal" required>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Shop Settings
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Only Administrators can change the shop branding name and address.
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Card 2: Admin / User Profile & Password Settings -->
+    <div class="content-card">
+        <div class="card-header-actions">
+            <h2 class="card-title">
+                <i class="fa-solid fa-user-gear" style="color: var(--accent-purple);"></i> My Profile & Password
+            </h2>
+        </div>
+
+        <form action="{{ url_for('settings') }}" method="POST">
+            <input type="hidden" name="action" value="update_profile">
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-id-card"></i> Full Name</label>
+                <input type="text" name="fullname" class="form-control" value="{{ user.fullname if user else session.get('fullname') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-user"></i> Username</label>
+                <input type="text" name="username" class="form-control" value="{{ user.username if user else session.get('username') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-key"></i> New Password (Leave blank to keep current)</label>
+                <input type="password" name="password" class="form-control" placeholder="••••••••">
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-solid fa-phone"></i> Phone Number</label>
+                    <input type="text" name="phone" class="form-control" value="{{ user.phone if user else '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-solid fa-map-pin"></i> Location</label>
+                    <input type="text" name="location" class="form-control" value="{{ user.location if user else '' }}">
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-user-check"></i> Update Profile
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

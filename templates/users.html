@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}User Control - {{ shop_settings.shop_name }}{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div>
+        <h1 class="page-title">User Account Control</h1>
+        <p class="page-subtitle">Manage system staff accounts, technicians, and administrator profile permissions.</p>
+    </div>
+    <div>
+        <button class="btn btn-primary" onclick="openModal('addUserModal')">
+            <i class="fa-solid fa-user-plus"></i> Create User Account
+        </button>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="card-header-actions">
+        <h2 class="card-title"><i class="fa-solid fa-users-gear"></i> System Accounts</h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Accounts: <strong>{{ users|length }}</strong></span>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Role / Category</th>
+                    <th>Location</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td><code>{{ u.username }}</code></td>
+                    <td>
+                        <strong>{{ u.fullname }}</strong>
+                        {% if u.id == session.get('user_id') %}
+                            <span style="font-size: 0.75rem; color: var(--accent-blue); margin-left: 4px;">(You)</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if u.category == 'ADMINISTRATOR' %}
+                            <span class="badge badge-in-progress" style="background: rgba(99,102,241,0.2); color: var(--accent-indigo);">ADMINISTRATOR</span>
+                        {% else %}
+                            <span class="badge badge-delivered">STAFF / USER</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ u.location }}</td>
+                    <td><i class="fa-solid fa-phone"></i> {{ u.phone }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <button class="btn btn-secondary btn-sm" onclick="openEditUserModal('{{ u.id }}', '{{ u.fullname }}', '{{ u.username }}', '{{ u.category }}', '{{ u.location }}', '{{ u.phone }}')">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </button>
+                            {% if u.id != session.get('user_id') %}
+                            <form action="{{ url_for('users') }}" method="POST" onsubmit="return confirm('Delete user {{ u.username }}?')" style="display:inline;">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="uid" value="{{ u.id }}">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Add User -->
+<div class="modal-overlay" id="addUserModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="card-title">Create New User Account</h3>
+            <button class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
+        </div>
+        <form action="{{ url_for('users') }}" method="POST">
+            <input type="hidden" name="action" value="add">
+            
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="e.g. tech2" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="fullname" class="form-control" placeholder="e.g. Hari Technician" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role Category</label>
+                    <select name="category" class="form-select" required>
+                        <option value="USER">USER / Technician</option>
+                        <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" name="location" class="form-control" placeholder="e.g. Kathmandu" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="phone" class="form-control" placeholder="e.g. 9841000000" required>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create User Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit User Account / Profile -->
+<div class="modal-overlay" id="editUserModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="card-title">Edit User Account</h3>
+            <button class="modal-close" onclick="closeModal('editUserModal')">&times;</button>
+        </div>
+        <form action="{{ url_for('users') }}" method="POST">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="uid" id="editUid">
+            
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" id="editUsername" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password (Blank to keep current)</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="fullname" id="editFullname" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role Category</label>
+                    <select name="category" id="editCategory" class="form-select" required>
+                        <option value="USER">USER / Technician</option>
+                        <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" name="location" id="editLocation" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="phone" id="editPhone" class="form-control" required>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save User Updates</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openEditUserModal(id, fullname, username, category, location, phone) {
+    document.getElementById('editUid').value = id;
+    document.getElementById('editFullname').value = fullname;
+    document.getElementById('editUsername').value = username;
+    document.getElementById('editCategory').value = category;
+    document.getElementById('editLocation').value = location;
+    document.getElementById('editPhone').value = phone;
+    openModal('editUserModal');
+}
+</script>
+{% endblock %}

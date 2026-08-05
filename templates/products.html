@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Product Inventory - ElectroIMS{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div>
+        <h1 class="page-title">Product Inventory & Stock</h1>
+        <p class="page-subtitle">Manage catalog items, spare parts, cost prices, and stock levels.</p>
+    </div>
+    <div>
+        <button class="btn btn-primary" onclick="openModal('addProductModal')">
+            <i class="fa-solid fa-plus"></i> Add New Product
+        </button>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="card-header-actions">
+        <input type="text" id="productSearch" class="form-control" placeholder="🔍 Search products by code, name, or brand..." style="max-width: 380px;" onkeyup="filterTable('productSearch', 'productsTable')">
+        <div>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Total Products: <strong>{{ products|length }}</strong></span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="productsTable">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Product Name</th>
+                    <th>Brand</th>
+                    <th>Cost Price</th>
+                    <th>Selling Price</th>
+                    <th>In Stock Qty</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td><code>{{ p.productcode }}</code></td>
+                    <td><strong>{{ p.productname }}</strong></td>
+                    <td>{{ p.brand }}</td>
+                    <td>Rs {{ "%.2f"|format(p.costprice) }}</td>
+                    <td>Rs {{ "%.2f"|format(p.sellingprice) }}</td>
+                    <td>
+                        {% if p.quantity < 5 %}
+                            <span class="badge badge-diagnosing" style="background: rgba(244,63,94,0.15); color: var(--accent-rose);">{{ p.quantity }} units</span>
+                        {% else %}
+                            <span class="badge badge-ready">{{ p.quantity }} units</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary btn-sm" onclick="openEditProductModal('{{ p.id }}', '{{ p.productcode }}', '{{ p.productname }}', '{{ p.brand }}', '{{ p.costprice }}', '{{ p.sellingprice }}')">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <form action="{{ url_for('products') }}" method="POST" onsubmit="return confirm('Delete product {{ p.productname }}?')" style="display:inline;">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="pid" value="{{ p.id }}">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                        No products found in inventory catalog.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Add Product -->
+<div class="modal-overlay" id="addProductModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="card-title"><i class="fa-solid fa-box" style="color:var(--accent-blue);"></i> Add New Product</h3>
+            <button class="modal-close" onclick="closeModal('addProductModal')">&times;</button>
+        </div>
+        <form action="{{ url_for('products') }}" method="POST">
+            <input type="hidden" name="action" value="add">
+            
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Product Code</label>
+                    <input type="text" name="productcode" class="form-control" placeholder="e.g. prod10" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Brand</label>
+                    <input type="text" name="brand" class="form-control" placeholder="e.g. Samsung / CG" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" name="productname" class="form-control" placeholder="e.g. LED Display Panel 32 inch" required>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Cost Price (Rs)</label>
+                    <input type="number" step="0.01" name="costprice" class="form-control" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Selling Price (Rs)</label>
+                    <input type="number" step="0.01" name="sellingprice" class="form-control" placeholder="0.00" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Initial Stock Quantity</label>
+                <input type="number" name="initial_quantity" class="form-control" placeholder="0" value="0" required>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addProductModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Product -->
+<div class="modal-overlay" id="editProductModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="card-title">Edit Product Details</h3>
+            <button class="modal-close" onclick="closeModal('editProductModal')">&times;</button>
+        </div>
+        <form action="{{ url_for('products') }}" method="POST">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="pid" id="editPid">
+            
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Product Code</label>
+                    <input type="text" name="productcode" id="editCode" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Brand</label>
+                    <input type="text" name="brand" id="editBrand" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" name="productname" id="editName" class="form-control" required>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Cost Price (Rs)</label>
+                    <input type="number" step="0.01" name="costprice" id="editCost" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Selling Price (Rs)</label>
+                    <input type="number" step="0.01" name="sellingprice" id="editSell" class="form-control" required>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editProductModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openEditProductModal(id, code, name, brand, cost, sell) {
+    document.getElementById('editPid').value = id;
+    document.getElementById('editCode').value = code;
+    document.getElementById('editName').value = name;
+    document.getElementById('editBrand').value = brand;
+    document.getElementById('editCost').value = cost;
+    document.getElementById('editSell').value = sell;
+    openModal('editProductModal');
+}
+</script>
+{% endblock %}

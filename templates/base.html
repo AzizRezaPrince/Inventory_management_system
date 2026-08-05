@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ shop_settings.shop_name }} - Electronics Shop IMS{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+{% if session.get('user_id') %}
+    <div class="app-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div class="brand-title">
+                    {{ shop_settings.shop_name }}
+                    <span>{{ shop_settings.shop_tagline }}</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('repairs') }}" class="{% if request.endpoint == 'repairs' %}active{% endif %}">
+                        <i class="fa-solid fa-wrench"></i> Repair Services
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('products') }}" class="{% if request.endpoint == 'products' %}active{% endif %}">
+                        <i class="fa-solid fa-boxes-stacked"></i> Product Inventory
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('sales') }}" class="{% if request.endpoint == 'sales' %}active{% endif %}">
+                        <i class="fa-solid fa-cart-shopping"></i> Sales & Receipts
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('purchases') }}" class="{% if request.endpoint == 'purchases' %}active{% endif %}">
+                        <i class="fa-solid fa-truck-ramp-box"></i> Stock Purchases
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('suppliers') }}" class="{% if request.endpoint == 'suppliers' %}active{% endif %}">
+                        <i class="fa-solid fa-truck-field"></i> Suppliers
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('customers') }}" class="{% if request.endpoint == 'customers' %}active{% endif %}">
+                        <i class="fa-solid fa-users"></i> Customers
+                    </a>
+                </li>
+                {% if session.get('category') == 'ADMINISTRATOR' %}
+                <li>
+                    <a href="{{ url_for('users') }}" class="{% if request.endpoint == 'users' %}active{% endif %}">
+                        <i class="fa-solid fa-user-shield"></i> User Control
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('settings') }}" class="{% if request.endpoint == 'settings' %}active{% endif %}">
+                        <i class="fa-solid fa-gear"></i> Settings & Profile
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-user">
+                <a href="{{ url_for('settings') }}" class="user-info" style="text-decoration: none;" title="Manage Profile">
+                    <div class="user-name">{{ session.get('fullname') }} <i class="fa-solid fa-pen-to-square" style="font-size: 0.75rem; color: var(--accent-blue);"></i></div>
+                    <div class="user-role">{{ session.get('category') }}</div>
+                </a>
+                <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="alert-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                <span>{{ message }}</span>
+                                <i class="fa-solid fa-xmark" onclick="this.parentElement.remove()" style="cursor:pointer;"></i>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+{% else %}
+    <div style="width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-dark);">
+        {% block login_content %}{% endblock %}
+    </div>
+{% endif %}
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Pass shop settings to JavaScript for receipts
+        window.SHOP_SETTINGS = {
+            name: "{{ shop_settings.shop_name }}",
+            tagline: "{{ shop_settings.shop_tagline }}",
+            phone: "{{ shop_settings.shop_phone }}",
+            address: "{{ shop_settings.shop_address }}"
+        };
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

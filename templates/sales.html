@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Sales & Receipts - {{ shop_settings.shop_name }}{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div>
+        <h1 class="page-title">Sales & Receipts</h1>
+        <p class="page-subtitle">Quick product sales, stock deduction, and cash memo printing.</p>
+    </div>
+    <div>
+        <button class="btn btn-primary" onclick="openModal('addSaleModal')">
+            <i class="fa-solid fa-cart-shopping"></i> Process New Sale
+        </button>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="card-header-actions">
+        <h2 class="card-title"><i class="fa-solid fa-receipt"></i> Recent Sales History</h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Sales: <strong>{{ sales|length }}</strong></span>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date / Invoice</th>
+                    <th>Product</th>
+                    <th>Customer</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Sold By</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales %}
+                    {% set pname = sale.productcode %}
+                    {% set unit_price = (sale.revenue / sale.quantity) if sale.quantity > 0 else 0 %}
+                    {% for p in products %}
+                        {% if p.productcode == sale.productcode %}
+                            {% set pname = p.productname %}
+                            {% set unit_price = p.sellingprice %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% set cname = sale.customercode %}
+                    {% for c in customers %}
+                        {% if c.customercode == sale.customercode %}
+                            {% set cname = c.fullname %}
+                        {% endif %}
+                    {% endfor %}
+
+                <tr>
+                    <td>
+                        <strong>INV-{{ sale.id }}</strong><br>
+                        <small style="color: var(--text-muted);">{{ sale.date }}</small>
+                    </td>
+                    <td>
+                        <strong>{{ pname }}</strong><br>
+                        <code>{{ sale.productcode }}</code>
+                    </td>
+                    <td>
+                        <strong>{{ cname }}</strong>
+                    </td>
+                    <td><span class="badge badge-received">{{ sale.quantity }} units</span></td>
+                    <td><strong style="color: var(--accent-emerald); font-size: 1rem;">Rs {{ "%.2f"|format(sale.revenue) }}</strong></td>
+                    <td>{{ sale.soldby }}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="printSalesReceipt('{{ sale.id }}', '{{ sale.date }}', '{{ sale.productcode }}', '{{ pname }}', '{{ cname }}', '{{ sale.customercode }}', '{{ sale.quantity }}', '{{ unit_price }}', '{{ sale.revenue }}', '{{ sale.soldby }}')">
+                            <i class="fa-solid fa-print"></i> Print Receipt
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales transactions recorded yet. Click Process New Sale to make your first sale!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Process Sale (Simplified Form) -->
+<div class="modal-overlay" id="addSaleModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="card-title"><i class="fa-solid fa-cart-plus" style="color: var(--accent-emerald);"></i> Process Product Sale</h3>
+            <button class="modal-close" onclick="closeModal('addSaleModal')">&times;</button>
+        </div>
+        <form action="{{ url_for('sales') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Product Item</label>
+                <select name="productcode" id="saleProduct" class="form-select" onchange="updateLiveSalePrice()" required>
+                    {% for p in products %}
+                        <option value="{{ p.productcode }}" data-price="{{ p.sellingprice }}" data-stock="{{ p.quantity }}">
+                            {{ p.productname }} — Rs {{ "%.2f"|format(p.sellingprice) }} (Stock: {{ p.quantity }})
+                        </option>
+                    {% else %}
+                        <option value="" disabled selected>No products in inventory yet!</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Customer Name</label>
+                <input type="text" name="customer_input" list="customerSuggestions" class="form-control" placeholder="Type customer name or select..." value="Walk-in Customer" required autocomplete="off">
+                <datalist id="customerSuggestions">
+                    <option value="Walk-in Customer"></option>
+                    {% for c in customers %}
+                        <option value="{{ c.fullname }}"></option>
+                    {% endfor %}
+                </datalist>
+                <small style="color: var(--text-muted); font-size: 0.75rem;">Directly type any customer name (Auto-syncs to Database).</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="quantity" id="saleQty" class="form-control" placeholder="1" min="1" value="1" oninput="updateLiveSalePrice()" required>
+            </div>
+
+            <!-- Live Calculated Total Box -->
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 1rem; margin-top: 1rem; text-align: center;">
+                <span style="color: var(--text-muted); font-size: 0.85rem;">Total Payable Amount:</span>
+                <div id="liveTotalDisplay" style="font-size: 1.5rem; font-weight: 700; color: var(--accent-emerald); margin-top: 2px;">Rs 0.00</div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addSaleModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Process Sale & Deduct Stock</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Printable Sales Cash Memo Receipt -->
+<div class="modal-overlay" id="salesReceiptModal">
+    <div class="modal-box" style="max-width: 550px;">
+        <div class="modal-header">
+            <h3 class="card-title"><i class="fa-solid fa-receipt"></i> Printable Sales Cash Memo</h3>
+            <button class="modal-close" onclick="closeModal('salesReceiptModal')">&times;</button>
+        </div>
+        <div id="salesReceiptModalBody">
+            <!-- Dynamically populated by JS -->
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="closeModal('salesReceiptModal')">Close</button>
+            <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Invoice</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateLiveSalePrice() {
+    const select = document.getElementById('saleProduct');
+    const qtyInput = document.getElementById('saleQty');
+    const display = document.getElementById('liveTotalDisplay');
+
+    if (select && select.selectedOptions.length > 0) {
+        const option = select.selectedOptions[0];
+        const price = parseFloat(option.getAttribute('data-price') || 0);
+        const qty = parseInt(qtyInput.value || 1);
+        const total = price * qty;
+        display.innerText = 'Rs ' + total.toFixed(2);
+    }
+}
+document.addEventListener('DOMContentLoaded', updateLiveSalePrice);
+</script>
+{% endblock %}

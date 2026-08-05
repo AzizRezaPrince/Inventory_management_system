@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Stock Purchases - {{ shop_settings.shop_name }}{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div>
+        <h1 class="page-title">Stock Purchase Intake</h1>
+        <p class="page-subtitle">Log new inventory stock received from suppliers.</p>
+    </div>
+    <div>
+        <button class="btn btn-primary" onclick="openModal('addPurchaseModal')">
+            <i class="fa-solid fa-cart-flatbed"></i> Record Stock Purchase
+        </button>
+    </div>
+</div>
+
+<div class="content-card">
+    <div class="card-header-actions">
+        <h2 class="card-title"><i class="fa-solid fa-list"></i> Purchase History</h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Records: <strong>{{ purchases|length }}</strong></span>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Supplier Name / Code</th>
+                    <th>Product Code</th>
+                    <th>Quantity Received</th>
+                    <th>Total Cost (Rs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pur in purchases %}
+                <tr>
+                    <td>{{ pur.date }}</td>
+                    <td><strong>{{ pur.suppliercode }}</strong></td>
+                    <td><code>{{ pur.productcode }}</code></td>
+                    <td><span class="badge badge-ready">+ {{ pur.quantity }} units</span></td>
+                    <td>Rs {{ "%.2f"|format(pur.totalcost) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No purchase intake logs found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Record Purchase -->
+<div class="modal-overlay" id="addPurchaseModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="card-title">Record Stock Purchase</h3>
+            <button class="modal-close" onclick="closeModal('addPurchaseModal')">&times;</button>
+        </div>
+        <form action="{{ url_for('purchases') }}" method="POST">
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Supplier Name / Code</label>
+                    <input type="text" name="supplier_input" list="supplierSuggestions" class="form-control" placeholder="Type supplier name or select..." value="General Supplier" required autocomplete="off">
+                    <datalist id="supplierSuggestions">
+                        <option value="General Supplier"></option>
+                        {% for s in suppliers %}
+                            <option value="{{ s.fullname }} ({{ s.suppliercode }})"></option>
+                        {% endfor %}
+                    </datalist>
+                    <small style="color: var(--text-muted); font-size: 0.75rem;">Type any supplier name manually or choose from list.</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Select Product</label>
+                    <select name="productcode" class="form-select" required>
+                        {% for p in products %}
+                            <option value="{{ p.productcode }}">{{ p.productname }} ({{ p.productcode }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Quantity Received</label>
+                    <input type="number" name="quantity" class="form-control" placeholder="0" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Total Cost Price (Rs)</label>
+                    <input type="number" step="0.01" name="totalcost" class="form-control" placeholder="0.00" required>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addPurchaseModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save & Update Stock</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
