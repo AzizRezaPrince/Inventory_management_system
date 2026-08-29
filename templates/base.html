@@ -2,15 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}{{ shop_settings.shop_name }} - Electronics Shop IMS{% endblock %}</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><path d='M30 30h40v40H30z' fill='none' stroke='%23ffffff' stroke-width='6'/><path d='M40 40h20v20H40z' fill='%23ffffff'/><path d='M20 40h10M20 60h10M70 40h10M70 60h10M40 20v10M60 20v10M40 70v10M60 70v10' stroke='%23ffffff' stroke-width='6' stroke-linecap='round'/></svg>">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 {% if session.get('user_id') %}
+    <!-- Mobile Backdrop Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
     <div class="app-wrapper">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
@@ -25,50 +29,64 @@
             </div>
 
             <ul class="sidebar-menu">
+                {% if session.get('category') != 'TECHNICIAN' %}
                 <li>
-                    <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}" onclick="closeMobileSidebar()">
                         <i class="fa-solid fa-chart-line"></i> Dashboard
                     </a>
                 </li>
+                {% endif %}
                 <li>
-                    <a href="{{ url_for('repairs') }}" class="{% if request.endpoint == 'repairs' %}active{% endif %}">
+                    <a href="{{ url_for('repairs') }}" class="{% if request.endpoint == 'repairs' %}active{% endif %}" onclick="closeMobileSidebar()">
                         <i class="fa-solid fa-wrench"></i> Repair Services
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('products') }}" class="{% if request.endpoint == 'products' %}active{% endif %}">
+                    <a href="{{ url_for('products') }}" class="{% if request.endpoint == 'products' %}active{% endif %}" onclick="closeMobileSidebar()">
                         <i class="fa-solid fa-boxes-stacked"></i> Product Inventory
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('sales') }}" class="{% if request.endpoint == 'sales' %}active{% endif %}">
-                        <i class="fa-solid fa-cart-shopping"></i> Sales & Receipts
+                    <a href="{{ url_for('sales') }}" class="{% if request.endpoint == 'sales' %}active{% endif %}" onclick="closeMobileSidebar()">
+                        <i class="fa-solid fa-cart-shopping"></i> Sales
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('purchases') }}" class="{% if request.endpoint == 'purchases' %}active{% endif %}">
+                    <a href="{{ url_for('purchases') }}" class="{% if request.endpoint == 'purchases' %}active{% endif %}" onclick="closeMobileSidebar()">
                         <i class="fa-solid fa-truck-ramp-box"></i> Stock Purchases
                     </a>
                 </li>
+                {% if session.get('category') != 'TECHNICIAN' %}
                 <li>
-                    <a href="{{ url_for('suppliers') }}" class="{% if request.endpoint == 'suppliers' %}active{% endif %}">
+                    <a href="{{ url_for('expenses') }}" class="{% if request.endpoint == 'expenses' %}active{% endif %}" onclick="closeMobileSidebar()">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Expense Tracker
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('suppliers') }}" class="{% if request.endpoint == 'suppliers' %}active{% endif %}" onclick="closeMobileSidebar()">
                         <i class="fa-solid fa-truck-field"></i> Suppliers
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('customers') }}" class="{% if request.endpoint == 'customers' %}active{% endif %}">
+                    <a href="{{ url_for('customers') }}" class="{% if request.endpoint == 'customers' %}active{% endif %}" onclick="closeMobileSidebar()">
                         <i class="fa-solid fa-users"></i> Customers
                     </a>
                 </li>
                 {% if session.get('category') == 'ADMINISTRATOR' %}
                 <li>
-                    <a href="{{ url_for('users') }}" class="{% if request.endpoint == 'users' %}active{% endif %}">
-                        <i class="fa-solid fa-user-shield"></i> User Control
+                    <a href="{{ url_for('users') }}" class="{% if request.endpoint == 'users' %}active{% endif %}" onclick="closeMobileSidebar()">
+                        <i class="fa-solid fa-user-shield"></i> User & Tech Control
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('activity_logs') }}" class="{% if request.endpoint == 'activity_logs' %}active{% endif %}" onclick="closeMobileSidebar()">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Activity Audit Logs
                     </a>
                 </li>
                 {% endif %}
                 <li>
-                    <a href="{{ url_for('settings') }}" class="{% if request.endpoint == 'settings' %}active{% endif %}">
+                    <a href="{{ url_for('settings') }}" class="{% if request.endpoint == 'settings' %}active{% endif %}" onclick="closeMobileSidebar()">
                         <i class="fa-solid fa-gear"></i> Settings & Profile
                     </a>
                 </li>
@@ -87,6 +105,19 @@
 
         <!-- Main Content Area -->
         <main class="main-content">
+            <!-- Mobile Header Bar -->
+            <div class="mobile-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <button class="mobile-toggle-btn" onclick="toggleMobileSidebar()" aria-label="Toggle Navigation Menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <span style="font-weight: 700; color: #fff; font-size: 1.05rem;">{{ shop_settings.shop_name }}</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--accent-blue); font-weight: 600;">
+                    <i class="fa-solid fa-user"></i> {{ session.get('fullname') }}
+                </div>
+            </div>
+
             <div class="alert-container">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -104,7 +135,7 @@
         </main>
     </div>
 {% else %}
-    <div style="width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-dark);">
+    <div style="width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-dark); padding: 1rem;">
         {% block login_content %}{% endblock %}
     </div>
 {% endif %}
@@ -118,6 +149,20 @@
             phone: "{{ shop_settings.shop_phone }}",
             address: "{{ shop_settings.shop_address }}"
         };
+
+        function toggleMobileSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.toggle('mobile-active');
+            if (overlay) overlay.classList.toggle('active');
+        }
+
+        function closeMobileSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.remove('mobile-active');
+            if (overlay) overlay.classList.remove('active');
+        }
     </script>
     {% block scripts %}{% endblock %}
 </body>

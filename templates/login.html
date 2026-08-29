@@ -3,44 +3,43 @@
 {% block title %}Login - Electronics Shop IMS{% endblock %}
 
 {% block login_content %}
-<div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+<div
+    style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
     <div style="text-align: center; margin-bottom: 2rem;">
-        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue)); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #fff; margin-bottom: 1rem;">
+        <div
+            style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue)); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #fff; margin-bottom: 1rem;">
             <i class="fa-solid fa-microchip"></i>
         </div>
-        <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">ElectroIMS Login</h2>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Inventory & Electronics Repair System</p>
+        <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">SS Technology</h2>
+        <!--<p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;"> </p>-->
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}" style="margin-bottom: 1.5rem;">
-                    <span>{{ message }}</span>
-                </div>
-            {% endfor %}
-        {% endif %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}" style="margin-bottom: 1.5rem;">
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
 
     <form action="{{ url_for('login') }}" method="POST">
         <div class="form-group">
             <label class="form-label"><i class="fa-solid fa-user"></i> Username</label>
-            <input type="text" name="username" class="form-control" placeholder="Enter your username" value="user4" required autofocus>
+            <input type="text" name="username" class="form-control" placeholder="Enter your username" required
+                autofocus>
         </div>
 
         <div class="form-group" style="margin-bottom: 1.75rem;">
             <label class="form-label"><i class="fa-solid fa-lock"></i> Password</label>
-            <input type="password" name="password" class="form-control" placeholder="Enter your password" value="user4" required>
+            <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem;">
+        <button type="submit" class="btn btn-primary"
+            style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem;">
             Sign In <i class="fa-solid fa-arrow-right"></i>
         </button>
     </form>
-
-    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
-        <p>Default Credentials:</p>
-        <code style="color: var(--accent-blue);">Username: user4 | Password: user4</code>
-    </div>
 </div>
 {% endblock %}

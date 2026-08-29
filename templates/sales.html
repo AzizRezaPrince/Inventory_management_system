@@ -1,60 +1,108 @@
 {% extends "base.html" %}
 
-{% block title %}Sales & Receipts - {{ shop_settings.shop_name }}{% endblock %}
+{% block title %}Sales Management - {{ shop_settings.shop_name }}{% endblock %}
 
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">Sales & Receipts</h1>
-        <p class="page-subtitle">Quick product sales, stock deduction, and cash memo printing.</p>
+        <h1 class="page-title"><i class="fa-solid fa-cart-shopping" style="color: var(--accent-emerald);"></i> Sales &
+            Customer Payment</h1>
+        <!--<p class="page-subtitle">Process quick product sales, custom pricing, customer paid/due tracking, and EMI installment plans.</p>-->
     </div>
     <div>
-        <button class="btn btn-primary" onclick="openModal('addSaleModal')">
-            <i class="fa-solid fa-cart-shopping"></i> Process New Sale
+        <button class="btn btn-primary" onclick="openModal('addSaleModal'); updateLiveSalePrice();">
+            <i class="fa-solid fa-cart-plus"></i> Process New Sale
         </button>
+    </div>
+</div>
+
+<!-- Sales Financial & Dues Summary Metrics -->
+<div class="metrics-grid" style="margin-bottom: 2rem;">
+    <div class="metric-card" style="border-left: 4px solid var(--accent-emerald);">
+        <div class="metric-icon emerald">
+            <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+        <div class="metric-details">
+            <h3>Tk {{ "%.2f"|format(total_sales_revenue) }}</h3>
+            <p>Total Gross Sales</p>
+            <small style="color: var(--text-muted); font-size: 0.78rem;">Total Sales Amount</small>
+        </div>
+    </div>
+
+    <div class="metric-card" style="border-left: 4px solid var(--accent-blue);">
+        <div class="metric-icon blue">
+            <i class="fa-solid fa-money-bill-wave"></i>
+        </div>
+        <div class="metric-details">
+            <h3>Tk {{ "%.2f"|format(total_sales_paid) }}</h3>
+            <p>Total Cash Received</p>
+            <small style="color: var(--accent-blue); font-weight: 600; font-size: 0.78rem;">Collected Sales</small>
+        </div>
+    </div>
+
+    <div class="metric-card" style="border-left: 4px solid var(--accent-rose);">
+        <div class="metric-icon rose">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+        </div>
+        <div class="metric-details">
+            <h3>Tk {{ "%.2f"|format(total_sales_due) }}</h3>
+            <p>Customer Due & EMI Balance</p>
+            <small style="color: var(--accent-rose); font-weight: 600; font-size: 0.78rem;">Outstanding
+                Receivables</small>
+        </div>
     </div>
 </div>
 
 <div class="content-card">
     <div class="card-header-actions">
-        <h2 class="card-title"><i class="fa-solid fa-receipt"></i> Recent Sales History</h2>
-        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Sales: <strong>{{ sales|length }}</strong></span>
+        <h2 class="card-title"><i class="fa-solid fa-receipt" style="color: var(--accent-emerald);"></i> Recent Sales
+        </h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Sales: <strong>{{ sales|length
+                }}</strong></span>
     </div>
 
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
-                    <th>Date / Invoice</th>
+                    <th>Date & Sale ID</th>
                     <th>Product</th>
-                    <th>Customer</th>
-                    <th>Quantity</th>
-                    <th>Total Price (Tk)</th>
-                    <th>Sold By</th>
-                    <th>Action</th>
+                    <th>Customer Name</th>
+                    <th>Qty</th>
+                    <th>Total Bill</th>
+                    <th>Paid Amount</th>
+                    <th>Payment Status / Due</th>
+                    <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for sale in sales %}
-                    {% set pname = sale.productcode %}
-                    {% set unit_price = (sale.revenue / sale.quantity) if sale.quantity > 0 else 0 %}
-                    {% for p in products %}
-                        {% if p.productcode == sale.productcode %}
-                            {% set pname = p.productname %}
-                            {% set unit_price = p.sellingprice %}
-                        {% endif %}
-                    {% endfor %}
+                {% set pname = sale.productcode %}
+                {% set unit_price = sale.unit_price if sale.unit_price else ((sale.revenue / sale.quantity) if
+                sale.quantity > 0 else 0) %}
+                {% for p in products %}
+                {% if p.productcode == sale.productcode %}
+                {% set pname = p.productname %}
+                {% if not sale.unit_price %}
+                {% set unit_price = p.sellingprice %}
+                {% endif %}
+                {% endif %}
+                {% endfor %}
 
-                    {% set cname = sale.customercode %}
-                    {% for c in customers %}
-                        {% if c.customercode == sale.customercode %}
-                            {% set cname = c.fullname %}
-                        {% endif %}
-                    {% endfor %}
+                {% set cname = sale.customercode %}
+                {% for c in customers %}
+                {% if c.customercode == sale.customercode %}
+                {% set cname = c.fullname %}
+                {% endif %}
+                {% endfor %}
 
-                <tr>
+                {% set due_val = sale.due_amount if sale.due_amount is defined else 0.0 %}
+                {% set paid_val = sale.paid_amount if sale.paid_amount is defined else sale.revenue %}
+                {% set ptype = sale.payment_type if sale.payment_type is defined else 'Full Payment' %}
+                {% set pstatus = sale.payment_status if sale.payment_status is defined else ('Fully Paid' if due_val <=
+                    0 else 'Customer Due' ) %} <tr>
                     <td>
-                        <strong>INV-{{ sale.id }}</strong><br>
+                        <strong>{{ sale.memo_code or sale.id }}</strong><br>
                         <small style="color: var(--text-muted);">{{ sale.date }}</small>
                     </td>
                     <td>
@@ -65,82 +113,218 @@
                         <strong>{{ cname }}</strong>
                     </td>
                     <td><span class="badge badge-received">{{ sale.quantity }} units</span></td>
-                    <td><strong style="color: var(--accent-emerald); font-size: 1rem;">Tk {{ "%.2f"|format(sale.revenue) }}</strong></td>
-                    <td>{{ sale.soldby }}</td>
+                    <td><strong>Tk {{ "%.2f"|format(sale.revenue) }}</strong></td>
+                    <td><span style="color: var(--accent-emerald); font-weight: 600;">Tk {{ "%.2f"|format(paid_val)
+                            }}</span></td>
                     <td>
-                        <button class="btn btn-secondary btn-sm"
-                            data-id="{{ sale.id }}"
-                            data-date="{{ sale.date }}"
-                            data-pcode="{{ sale.productcode }}"
-                            data-pname="{{ pname }}"
-                            data-cname="{{ cname }}"
-                            data-ccode="{{ sale.customercode }}"
-                            data-qty="{{ sale.quantity }}"
-                            data-unitprice="{{ unit_price }}"
-                            data-revenue="{{ sale.revenue }}"
-                            data-soldby="{{ sale.soldby }}"
-                            onclick="triggerSalesPrint(this)">
-                            <i class="fa-solid fa-print"></i> Print Receipt
-                        </button>
+                        {% if ptype == 'EMI / Installment' %}
+                        <span class="badge"
+                            style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3);">
+                            ⚡ EMI (Tk {{ "%.2f"|format(sale.monthly_installment or 0) }}/mo)
+                        </span>
+                        {% if due_val > 0 %}
+                        <br><small style="color: var(--accent-rose);">Due: Tk {{ "%.2f"|format(due_val) }}</small>
+                        {% endif %}
+                        {% elif due_val > 0 %}
+                        <span class="badge"
+                            style="background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.3);">
+                            Due: Tk {{ "%.2f"|format(due_val) }}
+                        </span>
+                        {% else %}
+                        <span class="badge badge-delivered">Fully Paid</span>
+                        {% endif %}
                     </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales transactions recorded yet. Click Process New Sale to make your first sale!</td>
-                </tr>
-                {% endfor %}
+                    <td style="text-align: center;">
+                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                            <button class="btn btn-secondary btn-sm" data-id="{{ sale.id }}" data-date="{{ sale.date }}"
+                                data-pcode="{{ sale.productcode }}" data-pname="{{ pname }}" data-cname="{{ cname }}"
+                                data-ccode="{{ sale.customercode }}" data-qty="{{ sale.quantity }}"
+                                data-unitprice="{{ unit_price }}" data-revenue="{{ sale.revenue }}"
+                                data-soldby="{{ sale.soldby }}" data-paid="{{ paid_val }}" data-due="{{ due_val }}"
+                                data-ptype="{{ ptype }}" data-pstatus="{{ pstatus }}"
+                                data-emimonths="{{ sale.emi_months or 0 }}"
+                                data-monthlyinst="{{ sale.monthly_installment or 0 }}"
+                                data-nextdue="{{ sale.next_due_date or '' }}" onclick="triggerSalesPrint(this)">
+                                <i class="fa-solid fa-print"></i> Receipt
+                            </button>
+                            {% if due_val > 0 %}
+                            <button class="btn btn-secondary btn-sm" style="color: var(--accent-emerald);"
+                                onclick="openCollectDueModal('{{ sale.id }}', '{{ cname }}', '{{ pname }}', '{{ due_val }}')"
+                                title="Collect Customer Due">
+                                <i class="fa-solid fa-wallet"></i> Collect Due
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No sales
+                            transactions recorded yet. Click Process New Sale to make your first sale!</td>
+                    </tr>
+                    {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- Modal: Process Sale (Simplified Form) -->
+<!-- Modal: Process Sale (With Paid/Due & EMI Tracking) -->
 <div class="modal-overlay" id="addSaleModal">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 650px;">
         <div class="modal-header">
-            <h3 class="card-title"><i class="fa-solid fa-cart-plus" style="color: var(--accent-emerald);"></i> Process Product Sale</h3>
+            <h3 class="card-title"><i class="fa-solid fa-cart-plus" style="color: var(--accent-emerald);"></i> Process
+                Product Sale</h3>
             <button class="modal-close" onclick="closeModal('addSaleModal')">&times;</button>
         </div>
         <form action="{{ url_for('sales') }}" method="POST">
+            <input type="hidden" name="action" value="add">
+
             <div class="form-group">
-                <label class="form-label">Product Item</label>
-                <select name="productcode" id="saleProduct" class="form-select" onchange="updateLiveSalePrice()" required>
+                <label class="form-label">Select Product Item *</label>
+                <select name="productcode" id="saleProduct" class="form-select" onchange="updateLiveSalePrice()"
+                    required>
                     {% for p in products %}
-                        <option value="{{ p.productcode }}" data-price="{{ p.sellingprice }}" data-stock="{{ p.quantity }}">
-                            {{ p.productname }} — Tk {{ "%.2f"|format(p.sellingprice) }} (Stock: {{ p.quantity }})
-                        </option>
+                    <option value="{{ p.productcode }}" data-price="{{ p.sellingprice }}" data-stock="{{ p.quantity }}">
+                        {{ p.productname }} — Default Price: Tk {{ "%.2f"|format(p.sellingprice) }} (Stock: {{
+                        p.quantity }})
+                    </option>
                     {% else %}
-                        <option value="" disabled selected>No products in inventory yet!</option>
+                    <option value="" disabled selected>No products in inventory!</option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Customer Name</label>
-                <input type="text" name="customer_input" list="customerSuggestions" class="form-control" placeholder="Type customer name or select..." value="Walk-in Customer" required autocomplete="off">
+                <label class="form-label">Customer Name *</label>
+                <input type="text" name="customer_input" list="customerSuggestions" class="form-control"
+                    placeholder="Type customer name or select..." value="Walk-in Customer" required autocomplete="off">
                 <datalist id="customerSuggestions">
                     <option value="Walk-in Customer"></option>
                     {% for c in customers %}
-                        <option value="{{ c.fullname }}"></option>
+                    <option value="{{ c.fullname }}"></option>
                     {% endfor %}
                 </datalist>
-                <small style="color: var(--text-muted); font-size: 0.75rem;">Directly type any customer name (Auto-syncs to Database).</small>
+                <small style="color: var(--text-muted); font-size: 0.75rem;">Customer name</small>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Quantity</label>
-                <input type="number" name="quantity" id="saleQty" class="form-control" placeholder="1" min="1" value="1" oninput="updateLiveSalePrice()" required>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Selling Price per Unit (Tk) *</label>
+                    <input type="number" step="0.01" name="custom_selling_price" id="saleCustomPrice"
+                        class="form-control" placeholder="0.00" oninput="updateLiveSalePrice()" required>
+                    <small style="color: var(--text-muted); font-size: 0.75rem;">Default Catalog Price: <strong
+                            id="defaultPriceLabel" style="color: var(--accent-blue);">Tk 0.00</strong></small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quantity *</label>
+                    <input type="number" name="quantity" id="saleQty" class="form-control" placeholder="1" min="1"
+                        value="1" oninput="updateLiveSalePrice()" required>
+                </div>
             </div>
 
-            <!-- Live Calculated Total Box -->
-            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 1rem; margin-top: 1rem; text-align: center;">
-                <span style="color: var(--text-muted); font-size: 0.85rem;">Total Payable Amount:</span>
-                <div id="liveTotalDisplay" style="font-size: 1.5rem; font-weight: 700; color: var(--accent-emerald); margin-top: 2px;">Tk 0.00</div>
+            <!-- Payment Method / Type Selection -->
+            <div
+                style="background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border-color); border-radius: 10px; padding: 1rem; margin-top: 1rem;">
+                <h4 style="font-size: 0.9rem; color: var(--accent-emerald); margin-bottom: 0.75rem;"><i
+                        class="fa-solid fa-credit-card"></i> Payment Method & Due Tracking</h4>
+
+                <div class="form-group">
+                    <label class="form-label">Payment Mode *</label>
+                    <select name="payment_type" id="salePaymentType" class="form-select"
+                        onchange="toggleEmiAndDueFields()" required>
+                        <option value="Full Payment" selected>Full Payment </option>
+                        <option value="Customer Due">Customer Due / Partial Payment </option>
+                        <option value="EMI / Installment">EMI / Installment Purchase </option>
+                    </select>
+                </div>
+
+                <div class="form-grid-3"
+                    style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 0.75rem;">
+                    <div class="form-group">
+                        <label class="form-label">Total Bill Amount (Tk)</label>
+                        <input type="number" step="0.01" id="saleTotalBillDisplay" class="form-control"
+                            placeholder="0.00" style="font-weight: bold; color: var(--accent-emerald);" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Paid Amount Today (Tk) *</label>
+                        <input type="number" step="0.01" name="paid_amount" id="salePaidAmount" class="form-control"
+                            placeholder="0.00" oninput="calcSaleDue()" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Customer Due (Tk)</label>
+                        <input type="number" step="0.01" id="saleDueDisplay" class="form-control" placeholder="0.00"
+                            style="color: var(--accent-rose); font-weight: bold;" readonly>
+                    </div>
+                </div>
+
+                <!-- EMI Specific Sub-Fields -->
+                <div id="emiSubFields"
+                    style="display: none; background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; padding: 0.85rem; margin-top: 1rem;">
+                    <h5 style="font-size: 0.85rem; color: var(--accent-purple); margin-bottom: 0.5rem;"><i
+                            class="fa-solid fa-bolt"></i> EMI / Installment Plan Setup</h5>
+                    <div class="form-grid-3" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+                        <div class="form-group">
+                            <label class="form-label">EMI Tenure</label>
+                            <select name="emi_months" id="saleEmiMonths" class="form-select" onchange="calcSaleDue()">
+                                <option value="3">3 Months Plan</option>
+                                <option value="6" selected>6 Months Plan</option>
+                                <option value="12">12 Months Plan</option>
+                                <option value="24">24 Months Plan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Monthly Installment (Tk)</label>
+                            <input type="number" step="0.01" name="monthly_installment" id="saleMonthlyInstallment"
+                                class="form-control" placeholder="0.00"
+                                style="color: var(--accent-purple); font-weight: bold;" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Next Installment Date</label>
+                            <input type="date" name="next_due_date" id="saleNextDueDate" class="form-control">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('addSaleModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Process Sale & Deduct Stock</button>
+                <button type="submit" class="btn btn-primary"
+                    style="background: linear-gradient(135deg, var(--accent-emerald), var(--accent-blue));">
+                    <i class="fa-solid fa-check"></i> Confirm Sale
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Collect Customer Due -->
+<div class="modal-overlay" id="collectCustomerDueModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="card-title"><i class="fa-solid fa-wallet" style="color: var(--accent-emerald);"></i> Collect
+                Customer Due / EMI Payment</h3>
+            <button class="modal-close" onclick="closeModal('collectCustomerDueModal')">&times;</button>
+        </div>
+        <form action="{{ url_for('sales') }}" method="POST">
+            <input type="hidden" name="action" value="collect_due">
+            <input type="hidden" name="sale_id" id="dueSaleId">
+
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                Customer: <strong id="dueCustomerText" style="color: #fff;"></strong><br>
+                Product Purchased: <span id="dueProductText" style="color: var(--accent-blue);"></span><br>
+                Customer Due: <strong id="dueAmountText" style="color: var(--accent-rose);">Tk 0.00</strong>
+            </p>
+
+            <div class="form-group">
+                <label class="form-label">Payment Amount (Tk) *</label>
+                <input type="number" step="0.01" name="additional_paid" id="dueAddPaidInput" class="form-control"
+                    placeholder="0.00" required>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary"
+                    onclick="closeModal('collectCustomerDueModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Payment</button>
             </div>
         </form>
     </div>
@@ -150,7 +334,7 @@
 <div class="modal-overlay" id="salesReceiptModal">
     <div class="modal-box" style="max-width: 550px;">
         <div class="modal-header">
-            <h3 class="card-title"><i class="fa-solid fa-receipt"></i> Printable Sales Cash Memo</h3>
+            <h3 class="card-title"><i class="fa-solid fa-receipt"></i> Cash Memo</h3>
             <button class="modal-close" onclick="closeModal('salesReceiptModal')">&times;</button>
         </div>
         <div id="salesReceiptModalBody">
@@ -158,7 +342,8 @@
         </div>
         <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
             <button class="btn btn-secondary" onclick="closeModal('salesReceiptModal')">Close</button>
-            <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Invoice</button>
+            <button class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Cash
+                Memo</button>
         </div>
     </div>
 </div>
@@ -166,33 +351,114 @@
 
 {% block scripts %}
 <script>
-function triggerSalesPrint(btn) {
-    const saleId = btn.getAttribute('data-id');
-    const date = btn.getAttribute('data-date');
-    const pcode = btn.getAttribute('data-pcode');
-    const pname = btn.getAttribute('data-pname');
-    const cname = btn.getAttribute('data-cname');
-    const ccode = btn.getAttribute('data-ccode');
-    const qty = btn.getAttribute('data-qty');
-    const unitPrice = btn.getAttribute('data-unitprice');
-    const revenue = btn.getAttribute('data-revenue');
-    const soldBy = btn.getAttribute('data-soldby');
-    printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPrice, revenue, soldBy);
-}
+    function triggerSalesPrint(btn) {
+        const saleId = btn.getAttribute('data-id');
+        const date = btn.getAttribute('data-date');
+        const pcode = btn.getAttribute('data-pcode');
+        const pname = btn.getAttribute('data-pname');
+        const cname = btn.getAttribute('data-cname');
+        const ccode = btn.getAttribute('data-ccode');
+        const qty = btn.getAttribute('data-qty');
+        const unitPrice = btn.getAttribute('data-unitprice');
+        const revenue = btn.getAttribute('data-revenue');
+        const soldBy = btn.getAttribute('data-soldby');
+        const paid = btn.getAttribute('data-paid');
+        const due = btn.getAttribute('data-due');
+        const ptype = btn.getAttribute('data-ptype');
+        const pstatus = btn.getAttribute('data-pstatus');
+        const emiMonths = btn.getAttribute('data-emimonths');
+        const monthlyInst = btn.getAttribute('data-monthlyinst');
+        const nextDue = btn.getAttribute('data-nextdue');
 
-function updateLiveSalePrice() {
-    const select = document.getElementById('saleProduct');
-    const qtyInput = document.getElementById('saleQty');
-    const display = document.getElementById('liveTotalDisplay');
-
-    if (select && select.selectedOptions.length > 0) {
-        const option = select.selectedOptions[0];
-        const price = parseFloat(option.getAttribute('data-price') || 0);
-        const qty = parseInt(qtyInput.value || 1);
-        const total = price * qty;
-        display.innerText = 'Tk ' + total.toFixed(2);
+        printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPrice, revenue, soldBy, paid, due, ptype, pstatus, emiMonths, monthlyInst, nextDue);
     }
-}
-document.addEventListener('DOMContentLoaded', updateLiveSalePrice);
+
+    function updateLiveSalePrice() {
+        const select = document.getElementById('saleProduct');
+        const qtyInput = document.getElementById('saleQty');
+        const customPriceInput = document.getElementById('saleCustomPrice');
+        const defaultLabel = document.getElementById('defaultPriceLabel');
+        const billDisplay = document.getElementById('saleTotalBillDisplay');
+
+        if (select && select.selectedOptions.length > 0) {
+            const option = select.selectedOptions[0];
+            const defaultPrice = parseFloat(option.getAttribute('data-price') || 0);
+
+            if (defaultLabel) {
+                defaultLabel.innerText = 'Tk ' + defaultPrice.toFixed(2);
+            }
+
+            if (customPriceInput && customPriceInput.getAttribute('data-last-prod') !== select.value) {
+                customPriceInput.value = defaultPrice.toFixed(2);
+                customPriceInput.setAttribute('data-last-prod', select.value);
+            }
+
+            const unitPrice = parseFloat(customPriceInput ? customPriceInput.value : defaultPrice) || defaultPrice;
+            const qty = parseInt(qtyInput.value || 1);
+            const total = unitPrice * qty;
+
+            if (billDisplay) {
+                billDisplay.value = total.toFixed(2);
+            }
+
+            const ptype = document.getElementById('salePaymentType');
+            if (ptype && ptype.value === 'Full Payment') {
+                document.getElementById('salePaidAmount').value = total.toFixed(2);
+            }
+
+            calcSaleDue();
+        }
+    }
+
+    function toggleEmiAndDueFields() {
+        const ptype = document.getElementById('salePaymentType').value;
+        const emiBox = document.getElementById('emiSubFields');
+
+        if (ptype === 'EMI / Installment') {
+            emiBox.style.display = 'block';
+            // Set default next due date to 30 days from now
+            const now = new Date();
+            now.setDate(now.getDate() + 30);
+            document.getElementById('saleNextDueDate').value = now.toISOString().split('T')[0];
+        } else {
+            emiBox.style.display = 'none';
+        }
+
+        const total = parseFloat(document.getElementById('saleTotalBillDisplay').value) || 0;
+        if (ptype === 'Full Payment') {
+            document.getElementById('salePaidAmount').value = total.toFixed(2);
+        }
+        calcSaleDue();
+    }
+
+    function calcSaleDue() {
+        const total = parseFloat(document.getElementById('saleTotalBillDisplay').value) || 0;
+        const paidInput = document.getElementById('salePaidAmount');
+        const paid = parseFloat(paidInput ? paidInput.value : total) || 0;
+        const due = Math.max(0, total - paid);
+
+        const dueDisplay = document.getElementById('saleDueDisplay');
+        if (dueDisplay) dueDisplay.value = due.toFixed(2);
+
+        const ptype = document.getElementById('salePaymentType').value;
+        if (ptype === 'EMI / Installment') {
+            const months = parseInt(document.getElementById('saleEmiMonths').value) || 6;
+            const monthly = due > 0 ? (due / months) : 0;
+            document.getElementById('saleMonthlyInstallment').value = monthly.toFixed(2);
+        }
+    }
+
+    function openCollectDueModal(saleId, customer, product, dueAmt) {
+        document.getElementById('dueSaleId').value = saleId;
+        document.getElementById('dueCustomerText').innerText = customer;
+        document.getElementById('dueProductText').innerText = product;
+        document.getElementById('dueAmountText').innerText = 'Tk ' + parseFloat(dueAmt).toFixed(2);
+        document.getElementById('dueAddPaidInput').value = parseFloat(dueAmt).toFixed(2);
+        openModal('collectCustomerDueModal');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        updateLiveSalePrice();
+    });
 </script>
 {% endblock %}

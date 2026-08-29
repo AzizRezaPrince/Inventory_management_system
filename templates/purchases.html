@@ -5,20 +5,71 @@
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">Stock Purchase Intake</h1>
-        <p class="page-subtitle">Log new inventory stock received from suppliers.</p>
+        <h1 class="page-title"><i class="fa-solid fa-truck-ramp-box" style="color: var(--accent-blue);"></i> Stock
+            Purchases & Inventory</h1>
+        <!--  <p class="page-subtitle">Receive stock from suppliers, auto-register products into inventory, and track supplier paid/due payments.</p> -->
     </div>
     <div>
-        <button class="btn btn-primary" onclick="openModal('addPurchaseModal')">
-            <i class="fa-solid fa-cart-flatbed"></i> Record Stock Purchase
+        <button class="btn btn-primary" onclick="openModal('addPurchaseModal'); toggleProductInputs();">
+            <i class="fa-solid fa-cart-flatbed"></i> Record Stock Intake
         </button>
+    </div>
+</div>
+
+<!-- Key Purchase & Supplier Due Metrics -->
+<div class="metrics-grid" style="margin-bottom: 2rem;">
+    <div class="metric-card" style="border-left: 4px solid var(--accent-blue);">
+        <div class="metric-icon blue">
+            <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <div class="metric-details">
+            <h3>{{ purchases|length }}</h3>
+            <p>Total Stock Intakes</p>
+            <small style="color: var(--text-muted); font-size: 0.78rem;">Recorded Stock Received</small>
+        </div>
+    </div>
+
+    <div class="metric-card" style="border-left: 4px solid var(--accent-purple);">
+        <div class="metric-icon purple">
+            <i class="fa-solid fa-calculator"></i>
+        </div>
+        <div class="metric-details">
+            <h3>Tk {{ "%.2f"|format(total_purchase_cost) }}</h3>
+            <p>Total Stock Purchase Cost</p>
+            <small style="color: var(--text-muted); font-size: 0.78rem;">Gross Cost of Inventory</small>
+        </div>
+    </div>
+
+    <div class="metric-card" style="border-left: 4px solid var(--accent-emerald);">
+        <div class="metric-icon emerald">
+            <i class="fa-solid fa-money-check-dollar"></i>
+        </div>
+        <div class="metric-details">
+            <h3>Tk {{ "%.2f"|format(total_purchase_paid) }}</h3>
+            <p>Total Paid to Suppliers</p>
+            <small style="color: var(--accent-emerald); font-weight: 600; font-size: 0.78rem;">Cleared Supplier
+                Payments</small>
+        </div>
+    </div>
+
+    <div class="metric-card" style="border-left: 4px solid var(--accent-rose);">
+        <div class="metric-icon rose">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+        </div>
+        <div class="metric-details">
+            <h3>Tk {{ "%.2f"|format(total_purchase_due) }}</h3>
+            <p>Total Supplier Dues (বকেয়া)</p>
+            <small style="color: var(--accent-rose); font-weight: 600; font-size: 0.78rem;">Supplier Dues</small>
+        </div>
     </div>
 </div>
 
 <div class="content-card">
     <div class="card-header-actions">
-        <h2 class="card-title"><i class="fa-solid fa-list"></i> Purchase History</h2>
-        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Records: <strong>{{ purchases|length }}</strong></span>
+        <h2 class="card-title"><i class="fa-solid fa-list-check" style="color: var(--accent-blue);"></i> Stock History
+        </h2>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Records: <strong>{{ purchases|length
+                }}</strong></span>
     </div>
 
     <div class="table-responsive">
@@ -26,24 +77,61 @@
             <thead>
                 <tr>
                     <th>Date & Time</th>
-                    <th>Supplier Name / Code</th>
-                    <th>Product Code</th>
-                    <th>Quantity Received</th>
+                    <th>Supplier Details</th>
+                    <th>Product & Code</th>
+                    <th>Qty</th>
                     <th>Total Cost (Tk)</th>
+                    <th>Paid Amount</th>
+                    <th>Due Amount / Status</th>
+                    <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for pur in purchases %}
+                {% set due_val = pur.due_amount if pur.due_amount is defined else 0.0 %}
+                {% set paid_val = pur.paid_amount if pur.paid_amount is defined else pur.totalcost %}
                 <tr>
-                    <td>{{ pur.date }}</td>
-                    <td><strong>{{ pur.suppliercode }}</strong></td>
-                    <td><code>{{ pur.productcode }}</code></td>
+                    <td><small style="color: var(--text-muted);">{{ pur.date }}</small></td>
+                    <td>
+                        <strong>{{ pur.suppliercode }}</strong><br>
+                        <small style="color: var(--text-muted);"><i class="fa-solid fa-phone"></i> {{ pur.supplier_phone
+                            or 'N/A' }}</small>
+                    </td>
+                    <td>
+                        <strong>{{ pur.productname or pur.productcode }}</strong><br>
+                        <code>{{ pur.productcode }}</code>
+                    </td>
                     <td><span class="badge badge-ready">+ {{ pur.quantity }} units</span></td>
-                    <td>Tk {{ "%.2f"|format(pur.totalcost) }}</td>
+                    <td><strong>Tk {{ "%.2f"|format(pur.totalcost) }}</strong></td>
+                    <td><span style="color: var(--accent-emerald); font-weight: 600;">Tk {{ "%.2f"|format(paid_val)
+                            }}</span></td>
+                    <td>
+                        {% if due_val > 0 %}
+                        <span class="badge"
+                            style="background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.3);">
+                            Due: Tk {{ "%.2f"|format(due_val) }}
+                        </span>
+                        {% else %}
+                        <span class="badge badge-delivered">Fully Paid</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% if due_val > 0 %}
+                        <button class="btn btn-secondary btn-sm" style="color: var(--accent-rose);"
+                            onclick="openPayDueModal('{{ pur.id }}', '{{ pur.suppliercode }}', '{{ pur.productname or pur.productcode }}', '{{ due_val }}')"
+                            title="Pay Supplier Due">
+                            <i class="fa-solid fa-wallet"></i> Pay Due
+                        </button>
+                        {% else %}
+                        <span style="color: var(--text-muted); font-size: 0.8rem;"><i
+                                class="fa-solid fa-circle-check"></i> Cleared</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No purchase intake logs found.</td>
+                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No Stock Logs
+                        found. Click "Add Stock" to add inventory!</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -51,52 +139,240 @@
     </div>
 </div>
 
-<!-- Modal: Record Purchase -->
+<!-- Modal: Record Purchase Intake -->
 <div class="modal-overlay" id="addPurchaseModal">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 650px;">
         <div class="modal-header">
-            <h3 class="card-title">Record Stock Purchase</h3>
+            <h3 class="card-title"><i class="fa-solid fa-truck-ramp-box" style="color: var(--accent-blue);"></i> Record
+                Stock & Inventory</h3>
             <button class="modal-close" onclick="closeModal('addPurchaseModal')">&times;</button>
         </div>
         <form action="{{ url_for('purchases') }}" method="POST">
-            <div class="form-grid-2">
-                <div class="form-group">
-                    <label class="form-label">Supplier Name / Code</label>
-                    <input type="text" name="supplier_input" list="supplierSuggestions" class="form-control" placeholder="Type supplier name or select..." value="General Supplier" required autocomplete="off">
-                    <datalist id="supplierSuggestions">
-                        <option value="General Supplier"></option>
-                        {% for s in suppliers %}
-                            <option value="{{ s.fullname }} ({{ s.suppliercode }})"></option>
-                        {% endfor %}
-                    </datalist>
-                    <small style="color: var(--text-muted); font-size: 0.75rem;">Type any supplier name manually or choose from list.</small>
+            <input type="hidden" name="action" value="add">
+
+            <!-- Supplier Section -->
+            <div
+                style="background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+                <h4 style="font-size: 0.9rem; color: var(--accent-blue); margin-bottom: 0.75rem;"><i
+                        class="fa-solid fa-truck-field"></i> Supplier Details</h4>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Supplier Name *</label>
+                        <input type="text" name="supplier_input" list="supplierSuggestions" class="form-control"
+                            placeholder="Enter Supplier Name" required autocomplete="off">
+                        <datalist id="supplierSuggestions">
+                            <option value="General Supplier"></option>
+                            {% for s in suppliers %}
+                            <option value="{{ s.fullname }}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Supplier Phone (Optional)</label>
+                        <input type="text" name="supplier_phone" class="form-control" placeholder="e.g. 01700000000">
+                    </div>
                 </div>
+            </div>
+
+            <!-- Product & Inventory Intake Section -->
+            <div
+                style="background: rgba(255, 255, 255, 0.02); border: 1px dashed var(--border-color); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+                <h4 style="font-size: 0.9rem; color: var(--accent-indigo); margin-bottom: 0.75rem;"><i
+                        class="fa-solid fa-boxes-stacked"></i> Product & Inventory Details</h4>
+
                 <div class="form-group">
-                    <label class="form-label">Select Product</label>
-                    <select name="productcode" class="form-select" required>
+                    <label class="form-label">Select Product or Register New</label>
+                    <select name="productcode" id="purchaseProductSelect" class="form-select"
+                        onchange="toggleProductInputs()" required>
+                        <option value="NEW_PRODUCT" selected>+ Register & Intake NEW Product Item</option>
                         {% for p in products %}
-                            <option value="{{ p.productcode }}">{{ p.productname }} ({{ p.productcode }})</option>
+                        <option value="{{ p.productcode }}" data-name="{{ p.productname }}"
+                            data-category="{{ p.category }}" data-brand="{{ p.brand }}" data-cost="{{ p.costprice }}"
+                            data-sell="{{ p.sellingprice }}">
+                            {{ p.productname }} ({{ p.productcode }}) — Cost: Tk {{ "%.2f"|format(p.costprice) }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Category *</label>
+                        <select name="category" id="purCategory" class="form-select" required>
+                            <option value="General Electronics">General Electronics </option>
+                            <option value="Smart TV / Display">Smart TV / Display </option>
+                            <option value="Laptop / Notebook">Laptop / Notebook </option>
+                            <option value="Desktop PC / Computer">Desktop Computer </option>
+                            <option value="Smartphone / Mobile">Smartphone / Mobile </option>
+                            <option value="Audio System / Speaker">Audio System </option>
+                            <option value="Spare Parts / Component">Electronics Component </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Product Name *</label>
+                        <input type="text" name="productname" id="purProductName" class="form-control"
+                            placeholder="Enter Product Name" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Brand</label>
+                        <input type="text" name="brand" id="purBrand" class="form-control"
+                            placeholder="Enter Brand Name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quantity Received *</label>
+                        <input type="number" name="quantity" id="purQty" class="form-control" placeholder="1" min="1"
+                            value="1" oninput="calcPurTotal()" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Cost Price per Unit (Tk) *</label>
+                        <input type="number" step="0.01" name="cost_price" id="purCostPrice" class="form-control"
+                            placeholder="0.00" oninput="calcPurTotal()" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Selling Price per Unit (Tk) *</label>
+                        <input type="number" step="0.01" name="selling_price" id="purSellingPrice" class="form-control"
+                            placeholder="0.00" required>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-grid-2">
-                <div class="form-group">
-                    <label class="form-label">Quantity Received</label>
-                    <input type="number" name="quantity" class="form-control" placeholder="0" min="1" value="1" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Total Cost Price (Tk)</label>
-                    <input type="number" step="0.01" name="totalcost" class="form-control" placeholder="0.00" required>
+            <!-- Payment & Supplier Due Tracking Section -->
+            <div
+                style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+                <h4 style="font-size: 0.9rem; color: var(--accent-emerald); margin-bottom: 0.75rem;"><i
+                        class="fa-solid fa-money-bill-transfer"></i> Payment Due</h4>
+                <div class="form-grid-3" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Total Cost (Tk)</label>
+                        <input type="number" step="0.01" name="totalcost" id="purTotalCost" class="form-control"
+                            placeholder="0.00" oninput="calcPurDue()" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Paid Amount (Tk) *</label>
+                        <input type="number" step="0.01" name="paid_amount" id="purPaidAmount" class="form-control"
+                            placeholder="0.00" oninput="calcPurDue()" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due Amount (Tk)</label>
+                        <input type="number" step="0.01" id="purDueAmountDisplay" class="form-control"
+                            placeholder="0.00" style="color: var(--accent-rose); font-weight: bold;" readonly>
+                    </div>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('addPurchaseModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save & Update Stock</button>
+                <button type="submit" class="btn btn-primary"
+                    style="background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));">
+                    <i class="fa-solid fa-check"></i> Save Stock & Inventory
+                </button>
             </div>
         </form>
     </div>
 </div>
+
+<!-- Modal: Pay Supplier Due -->
+<div class="modal-overlay" id="paySupplierDueModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 class="card-title"><i class="fa-solid fa-wallet" style="color: var(--accent-rose);"></i> Pay Supplier
+                Due</h3>
+            <button class="modal-close" onclick="closeModal('paySupplierDueModal')">&times;</button>
+        </div>
+        <form action="{{ url_for('purchases') }}" method="POST">
+            <input type="hidden" name="action" value="update_payment">
+            <input type="hidden" name="pur_id" id="duePurId">
+
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                Supplier: <strong id="dueSupplierText" style="color: #fff;"></strong><br>
+                Product: <span id="dueProductText" style="color: var(--accent-blue);"></span><br>
+                Remaining Due: <strong id="dueAmountText" style="color: var(--accent-rose);">Tk 0.00</strong>
+            </p>
+
+            <div class="form-group">
+                <label class="form-label">Additional Amount Paid Now (Tk) *</label>
+                <input type="number" step="0.01" name="additional_paid" id="dueAddPaidInput" class="form-control"
+                    placeholder="0.00" required>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary"
+                    onclick="closeModal('paySupplierDueModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Clear Due</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleProductInputs() {
+        const select = document.getElementById('purchaseProductSelect');
+        const nameInput = document.getElementById('purProductName');
+        const catSelect = document.getElementById('purCategory');
+        const brandInput = document.getElementById('purBrand');
+        const costInput = document.getElementById('purCostPrice');
+        const sellInput = document.getElementById('purSellingPrice');
+
+        if (!select) return;
+
+        if (select.value === 'NEW_PRODUCT') {
+            nameInput.value = '';
+            brandInput.value = '';
+            costInput.value = '';
+            sellInput.value = '';
+            nameInput.readOnly = false;
+            costInput.readOnly = false;
+            sellInput.readOnly = false;
+        } else {
+            const opt = select.options[select.selectedIndex];
+            nameInput.value = opt.getAttribute('data-name') || '';
+            if (opt.getAttribute('data-category')) {
+                catSelect.value = opt.getAttribute('data-category');
+            }
+            brandInput.value = opt.getAttribute('data-brand') || '';
+            costInput.value = opt.getAttribute('data-cost') || '';
+            sellInput.value = opt.getAttribute('data-sell') || '';
+            calcPurTotal();
+        }
+    }
+
+    function calcPurTotal() {
+        const cost = parseFloat(document.getElementById('purCostPrice').value) || 0;
+        const qty = parseInt(document.getElementById('purQty').value) || 1;
+        const totalCostInput = document.getElementById('purTotalCost');
+        const paidInput = document.getElementById('purPaidAmount');
+
+        const total = cost * qty;
+        totalCostInput.value = total.toFixed(2);
+        if (!paidInput.value || parseFloat(paidInput.value) === 0) {
+            paidInput.value = total.toFixed(2);
+        }
+        calcPurDue();
+    }
+
+    function calcPurDue() {
+        const total = parseFloat(document.getElementById('purTotalCost').value) || 0;
+        const paid = parseFloat(document.getElementById('purPaidAmount').value) || 0;
+        const due = Math.max(0, total - paid);
+        document.getElementById('purDueAmountDisplay').value = due.toFixed(2);
+    }
+
+    function openPayDueModal(purId, supplier, product, dueAmt) {
+        document.getElementById('duePurId').value = purId;
+        document.getElementById('dueSupplierText').innerText = supplier;
+        document.getElementById('dueProductText').innerText = product;
+        document.getElementById('dueAmountText').innerText = 'Tk ' + parseFloat(dueAmt).toFixed(2);
+        document.getElementById('dueAddPaidInput').value = parseFloat(dueAmt).toFixed(2);
+        openModal('paySupplierDueModal');
+    }
+</script>
 {% endblock %}

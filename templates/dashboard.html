@@ -5,18 +5,78 @@
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">Electronics Shop Dashboard</h1>
-        <p class="page-subtitle">Welcome back, {{ session.get('fullname') }}! Here is your real-time shop summary.</p>
+        <h1 class="page-title">Admin Dashboard</h1>
+        <p class="page-subtitle">Welcome back, {{ session.get('fullname') }}! Real-time monthly overview, yearly growth & analytics.</p>
     </div>
     <div>
-        <a href="{{ url_for('repairs') }}" class="btn btn-primary">
-            <i class="fa-solid fa-plus"></i> New Repair Job
+        <a href="{{ url_for('sales') }}" class="btn btn-primary">
+            <i class="fa-solid fa-cart-plus"></i> Process New Sale
         </a>
     </div>
 </div>
 
-<!-- Key Metrics Grid -->
-<div class="metrics-grid">
+<!-- SECTION 1: Monthly Overview & Yearly Growth Metrics -->
+<div style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.15rem; font-weight: 600; color: var(--text-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-calendar-check" style="color: var(--accent-blue);"></i> Monthly Overview & Growth Metrics
+    </h2>
+    <div class="metrics-grid">
+        <div class="metric-card" style="border-left: 4px solid var(--accent-emerald);">
+            <div class="metric-icon emerald">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+            <div class="metric-details">
+                <h3>Tk {{ "%.2f"|format(monthly_total_profit) }}</h3>
+                <p>Monthly Net Profit</p>
+                <small style="color: var(--accent-emerald); font-weight: 600; font-size: 0.78rem;">
+                    <i class="fa-solid fa-calculator"></i> Earnings - Expenses (Tk {{ "%.2f"|format(monthly_total_expenses) }})
+                </small>
+            </div>
+        </div>
+
+        <div class="metric-card" style="border-left: 4px solid var(--accent-blue);">
+            <div class="metric-icon blue">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+            <div class="metric-details">
+                <h3>Tk {{ "%.2f"|format(monthly_sales_rev) }}</h3>
+                <p>Monthly Sales Revenue</p>
+                <small style="color: var(--text-muted); font-size: 0.78rem;">
+                    {{ monthly_sales_count }} item(s) sold this month
+                </small>
+            </div>
+        </div>
+
+        <div class="metric-card" style="border-left: 4px solid var(--accent-purple);">
+            <div class="metric-icon purple">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+            <div class="metric-details">
+                <h3>Tk {{ "%.2f"|format(monthly_repair_rev) }}</h3>
+                <p>Monthly Repair Revenue</p>
+                <small style="color: var(--text-muted); font-size: 0.78rem;">
+                    {{ monthly_repair_count }} repair(s) completed this month
+                </small>
+            </div>
+        </div>
+
+        <div class="metric-card" style="border-left: 4px solid var(--accent-amber);">
+            <div class="metric-icon amber">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="metric-details">
+                <h3>{% if yearly_growth_pct >= 0 %}+{% endif %}{{ "%.1f"|format(yearly_growth_pct) }}%</h3>
+                <p>Yearly Growth (YoY)</p>
+                <small style="color: var(--accent-amber); font-weight: 600; font-size: 0.78rem;">
+                    Tk {{ "%.2f"|format(yearly_total_revenue) }} Total Revenue ({{ curr_year }})
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 2: Key Operational Metrics Grid -->
+<div class="metrics-grid" style="margin-bottom: 2rem;">
     <div class="metric-card">
         <div class="metric-icon purple">
             <i class="fa-solid fa-wrench"></i>
@@ -53,13 +113,74 @@
         </div>
         <div class="metric-details">
             <h3>Tk {{ "%.2f"|format(total_revenue) }}</h3>
-            <p>Total Sales Revenue</p>
+            <p>All-Time Sales Revenue</p>
         </div>
     </div>
 </div>
 
-<!-- Active Repairs & Low Stock Grid -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+<!-- SECTION 3: Yearly Growth & Monthly Trend Line/Bar Chart -->
+<div class="content-card" style="margin-bottom: 2rem; padding: 1.5rem;">
+    <div class="card-header-actions" style="margin-bottom: 1.25rem;">
+        <div>
+            <h2 class="card-title">
+                <i class="fa-solid fa-chart-area" style="color: var(--accent-blue);"></i> Monthly Overview & Yearly Revenue Growth ({{ curr_year }})
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.825rem; margin-top: 0.25rem;">
+                Comparison of Monthly Sales Revenue, Repair Revenue, and Net Profit across the year.
+            </p>
+        </div>
+        <div style="display: flex; gap: 1rem; font-size: 0.8rem;">
+            <span style="display: flex; align-items: center; gap: 0.35rem; color: #38bdf8;">
+                <span style="width: 12px; height: 12px; background: #38bdf8; border-radius: 3px;"></span> Sales Rev
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.35rem; color: #a855f7;">
+                <span style="width: 12px; height: 12px; background: #a855f7; border-radius: 3px;"></span> Repair Rev
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.35rem; color: #10b981;">
+                <span style="width: 12px; height: 12px; background: #10b981; border-radius: 3px;"></span> Net Profit
+            </span>
+        </div>
+    </div>
+    <div style="height: 320px; position: relative;">
+        <canvas id="monthlyGrowthChart"></canvas>
+    </div>
+</div>
+
+<!-- SECTION 4: Separate Pie Charts (Sells & Repairs) -->
+<div class="form-grid-2" style="margin-bottom: 2rem;">
+    <!-- Pie Chart 1: Sells Breakdown -->
+    <div class="content-card" style="padding: 1.5rem;">
+        <div class="card-header-actions" style="margin-bottom: 1rem;">
+            <h2 class="card-title">
+                <i class="fa-solid fa-chart-pie" style="color: var(--accent-blue);"></i> Sales Revenue Breakdown (Pie Chart)
+            </h2>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">
+            Product-wise revenue distribution for sales.
+        </p>
+        <div style="height: 260px; display: flex; align-items: center; justify-content: center; position: relative;">
+            <canvas id="salesPieChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Pie Chart 2: Repairs Breakdown -->
+    <div class="content-card" style="padding: 1.5rem;">
+        <div class="card-header-actions" style="margin-bottom: 1rem;">
+            <h2 class="card-title">
+                <i class="fa-solid fa-chart-pie" style="color: var(--accent-purple);"></i> Repair Services Breakdown (Pie Chart)
+            </h2>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">
+            Repair jobs breakdown by status workflow.
+        </p>
+        <div style="height: 260px; display: flex; align-items: center; justify-content: center; position: relative;">
+            <canvas id="repairPieChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 5: Tables Grid (Active Repairs & Low Stock Alerts) -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
     <!-- Active Repairs Summary -->
     <div class="content-card">
         <div class="card-header-actions">
@@ -70,7 +191,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Ticket</th>
+                        <th>Ticket ID</th>
                         <th>Device</th>
                         <th>Status</th>
                         <th>Est. Cost</th>
@@ -109,7 +230,7 @@
     <!-- Low Stock Inventory Alert -->
     <div class="content-card">
         <div class="card-header-actions">
-            <h2 class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-amber);"></i> Low Stock Alerts (< 5 Qty)</h2>
+            <h2 class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-amber);"></i> Low Stock Alerts (&lt; 5 Qty)</h2>
             <a href="{{ url_for('products') }}" class="btn btn-secondary btn-sm">Manage Inventory</a>
         </div>
         <div class="table-responsive">
@@ -144,4 +265,155 @@
         </div>
     </div>
 </div>
+
+<!-- SECTION 6: Chart.js Initialization Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Shared Theme Colors
+    const textColor = '#94a3b8';
+    const gridColor = 'rgba(255, 255, 255, 0.05)';
+
+    // 1. Monthly Overview & Yearly Growth Chart (Bar/Line)
+    const ctxTrend = document.getElementById('monthlyGrowthChart').getContext('2d');
+    new Chart(ctxTrend, {
+        type: 'bar',
+        data: {
+            labels: {{ months_labels|tojson }},
+            datasets: [
+                {
+                    label: 'Sales Revenue (Tk)',
+                    data: {{ monthly_sales_trend|tojson }},
+                    backgroundColor: 'rgba(56, 189, 248, 0.6)',
+                    borderColor: '#38bdf8',
+                    borderWidth: 2,
+                    borderRadius: 6
+                },
+                {
+                    label: 'Repair Revenue (Tk)',
+                    data: {{ monthly_repair_trend|tojson }},
+                    backgroundColor: 'rgba(168, 85, 247, 0.6)',
+                    borderColor: '#a855f7',
+                    borderWidth: 2,
+                    borderRadius: 6
+                },
+                {
+                    label: 'Net Profit (Tk)',
+                    type: 'line',
+                    data: {{ monthly_profit_trend|tojson }},
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#10b981',
+                    pointRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': Tk ' + context.raw.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: gridColor },
+                    ticks: { color: textColor }
+                },
+                y: {
+                    grid: { color: gridColor },
+                    ticks: {
+                        color: textColor,
+                        callback: function(val) { return 'Tk ' + val; }
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. Sales Pie Chart (Separate)
+    const ctxSalesPie = document.getElementById('salesPieChart').getContext('2d');
+    new Chart(ctxSalesPie, {
+        type: 'doughnut',
+        data: {
+            labels: {{ sales_pie_labels|tojson }},
+            datasets: [{
+                data: {{ sales_pie_data|tojson }},
+                backgroundColor: [
+                    '#38bdf8',
+                    '#6366f1',
+                    '#10b981',
+                    '#f59e0b',
+                    '#f43f5e'
+                ],
+                borderWidth: 2,
+                borderColor: '#1e293b'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: textColor, padding: 15, font: { size: 11 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': Tk ' + context.raw.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 3. Repair Pie Chart (Separate)
+    const ctxRepairPie = document.getElementById('repairPieChart').getContext('2d');
+    new Chart(ctxRepairPie, {
+        type: 'doughnut',
+        data: {
+            labels: {{ repair_pie_labels|tojson }},
+            datasets: [{
+                data: {{ repair_pie_data|tojson }},
+                backgroundColor: [
+                    '#a855f7',
+                    '#38bdf8',
+                    '#f59e0b',
+                    '#10b981',
+                    '#f43f5e'
+                ],
+                borderWidth: 2,
+                borderColor: '#1e293b'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: textColor, padding: 15, font: { size: 11 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.raw + ' Ticket(s)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

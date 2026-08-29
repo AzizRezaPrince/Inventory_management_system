@@ -1,64 +1,112 @@
 {% extends "base.html" %}
 
-{% block title %}User Control - {{ shop_settings.shop_name }}{% endblock %}
+{% block title %}User & Technician Control - {{ shop_settings.shop_name }}{% endblock %}
 
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">User Account Control</h1>
-        <p class="page-subtitle">Manage system staff accounts, technicians, and administrator profile permissions.</p>
+        <h1 class="page-title"><i class="fa-solid fa-user-shield" style="color: var(--accent-indigo);"></i> User
+            Management</h1>
+        <!-- <p class="page-subtitle">Add, edit, or manage system accounts and assign Technician vs Administrator permissions.</p>-->
     </div>
     <div>
         <button class="btn btn-primary" onclick="openModal('addUserModal')">
-            <i class="fa-solid fa-user-plus"></i> Create User Account
+            <i class="fa-solid fa-user-plus"></i> Add New User
         </button>
+    </div>
+</div>
+
+<!-- Key User Metrics -->
+<div class="metrics-grid" style="margin-bottom: 2rem;">
+    <div class="metric-card" style="border-left: 4px solid var(--accent-indigo);">
+        <div class="metric-icon purple">
+            <i class="fa-solid fa-users-gear"></i>
+        </div>
+        <div class="metric-details">
+            <h3>{{ users|length }}</h3>
+            <p>Total Registered Users</p>
+            <small style="color: var(--text-muted); font-size: 0.78rem;">Active Staff Accounts</small>
+        </div>
+    </div>
+
+    <div class="metric-card" style="border-left: 4px solid var(--accent-blue);">
+        <div class="metric-icon blue">
+            <i class="fa-solid fa-wrench"></i>
+        </div>
+        <div class="metric-details">
+            <h3>{{ tech_count }}</h3>
+            <p>Active Technicians</p>
+            <small style="color: var(--accent-blue); font-weight: 600; font-size: 0.78rem;">Restricted to Repairs
+                Workspace</small>
+        </div>
+    </div>
+
+    <div class="metric-card" style="border-left: 4px solid var(--accent-emerald);">
+        <div class="metric-icon emerald">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="metric-details">
+            <h3>{{ admin_count }}</h3>
+            <p>System Administrators</p>
+            <small style="color: var(--accent-emerald); font-weight: 600; font-size: 0.78rem;">Full Access & Activity
+                Logs</small>
+        </div>
     </div>
 </div>
 
 <div class="content-card">
     <div class="card-header-actions">
-        <h2 class="card-title"><i class="fa-solid fa-users-gear"></i> System Accounts</h2>
-        <span style="font-size: 0.85rem; color: var(--text-muted);">Total Accounts: <strong>{{ users|length }}</strong></span>
+        <input type="text" id="userSearch" class="form-control"
+            placeholder="Search users by name, username, phone or role..." style="max-width: 380px;"
+            onkeyup="filterTable('userSearch', 'usersTable')">
+        <div>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Total Accounts: <strong>{{ users|length
+                    }}</strong></span>
+        </div>
     </div>
 
     <div class="table-responsive">
-        <table>
+        <table id="usersTable">
             <thead>
                 <tr>
-                    <th>Username</th>
                     <th>Full Name</th>
-                    <th>Role / Category</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Contact Phone</th>
                     <th>Location</th>
-                    <th>Phone</th>
-                    <th>Actions</th>
+                    <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for u in users %}
                 <tr>
+                    <td><strong>{{ u.fullname }}</strong></td>
                     <td><code>{{ u.username }}</code></td>
                     <td>
-                        <strong>{{ u.fullname }}</strong>
-                        {% if u.id == session.get('user_id') %}
-                            <span style="font-size: 0.75rem; color: var(--accent-blue); margin-left: 4px;">(You)</span>
-                        {% endif %}
-                    </td>
-                    <td>
                         {% if u.category == 'ADMINISTRATOR' %}
-                            <span class="badge badge-in-progress" style="background: rgba(99,102,241,0.2); color: var(--accent-indigo);">ADMINISTRATOR</span>
+                        <span class="badge"
+                            style="background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.3);">
+                            <i class="fa-solid fa-shield"></i> ADMINISTRATOR
+                        </span>
                         {% else %}
-                            <span class="badge badge-delivered">STAFF / USER</span>
+                        <span class="badge"
+                            style="background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3);">
+                            <i class="fa-solid fa-wrench"></i> TECHNICIAN
+                        </span>
                         {% endif %}
                     </td>
+                    <td><i class="fa-solid fa-phone" style="color: var(--accent-blue);"></i> {{ u.phone }}</td>
                     <td>{{ u.location }}</td>
-                    <td><i class="fa-solid fa-phone"></i> {{ u.phone }}</td>
-                    <td>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <button class="btn btn-secondary btn-sm" onclick="openEditUserModal('{{ u.id }}', '{{ u.fullname }}', '{{ u.username }}', '{{ u.category }}', '{{ u.location }}', '{{ u.phone }}')">
-                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                    <td style="text-align: center;">
+                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                            <button class="btn btn-secondary btn-sm"
+                                onclick="openEditUserModal('{{ u.id }}', '{{ u.fullname }}', '{{ u.username }}', '{{ u.category }}', '{{ u.phone }}', '{{ u.location }}')">
+                                <i class="fa-solid fa-pen"></i> Edit
                             </button>
-                            {% if u.id != session.get('user_id') %}
-                            <form action="{{ url_for('users') }}" method="POST" onsubmit="return confirm('Delete user {{ u.username }}?')" style="display:inline;">
+                            {% if session.get('user_id') != u.id %}
+                            <form action="{{ url_for('users') }}" method="POST"
+                                onsubmit="return confirm('Delete user account {{ u.fullname }}?')"
+                                style="display:inline;">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="uid" value="{{ u.id }}">
                                 <button type="submit" class="btn btn-danger btn-sm">
@@ -68,6 +116,11 @@
                             {% endif %}
                         </div>
                     </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No user
+                        accounts found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -79,45 +132,47 @@
 <div class="modal-overlay" id="addUserModal">
     <div class="modal-box">
         <div class="modal-header">
-            <h3 class="card-title">Create New User Account</h3>
+            <h3 class="card-title"><i class="fa-solid fa-user-plus" style="color: var(--accent-indigo);"></i> Add New
+                User</h3>
             <button class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
         </div>
         <form action="{{ url_for('users') }}" method="POST">
             <input type="hidden" name="action" value="add">
-            
-            <div class="form-grid-2">
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" placeholder="e.g. tech2" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Enter password" required>
-                </div>
-            </div>
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="fullname" class="form-control" placeholder="e.g. Hari Technician" required>
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" name="fullname" class="form-control" placeholder="e.g. Technician Rafiq"
+                        required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Role Category</label>
+                    <label class="form-label">Role *</label>
                     <select name="category" class="form-select" required>
-                        <option value="USER">USER / Technician</option>
-                        <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+                        <option value="TECHNICIAN" selected>TECHNICIAN </option>
+                        <option value="ADMINISTRATOR">ADMINISTRATOR </option>
                     </select>
                 </div>
             </div>
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input type="text" name="location" class="form-control" placeholder="e.g. Kathmandu" required>
+                    <label class="form-label">Username *</label>
+                    <input type="text" name="username" class="form-control" placeholder="e.g. tech_rafiq" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="text" name="phone" class="form-control" placeholder="e.g. 9841000000" required>
+                    <label class="form-label">Password *</label>
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Contact Phone</label>
+                    <input type="text" name="phone" class="form-control" placeholder="e.g. 01700000000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" name="location" class="form-control" placeholder="e.g. Dhaka" value="Dhaka">
                 </div>
             </div>
 
@@ -129,56 +184,57 @@
     </div>
 </div>
 
-<!-- Modal: Edit User Account / Profile -->
+<!-- Modal: Edit User -->
 <div class="modal-overlay" id="editUserModal">
     <div class="modal-box">
         <div class="modal-header">
-            <h3 class="card-title">Edit User Account</h3>
+            <h3 class="card-title"><i class="fa-solid fa-user-pen" style="color: var(--accent-indigo);"></i> Edit User
+            </h3>
             <button class="modal-close" onclick="closeModal('editUserModal')">&times;</button>
         </div>
         <form action="{{ url_for('users') }}" method="POST">
             <input type="hidden" name="action" value="edit">
             <input type="hidden" name="uid" id="editUid">
-            
-            <div class="form-grid-2">
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" name="username" id="editUsername" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">New Password (Blank to keep current)</label>
-                    <input type="password" name="password" class="form-control" placeholder="••••••••">
-                </div>
-            </div>
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Full Name</label>
+                    <label class="form-label">Full Name *</label>
                     <input type="text" name="fullname" id="editFullname" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Role Category</label>
+                    <label class="form-label">Role *</label>
                     <select name="category" id="editCategory" class="form-select" required>
-                        <option value="USER">USER / Technician</option>
-                        <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+                        <option value="TECHNICIAN">TECHNICIAN </option>
+                        <option value="ADMINISTRATOR">ADMINISTRATOR </option>
                     </select>
                 </div>
             </div>
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input type="text" name="location" id="editLocation" class="form-control" required>
+                    <label class="form-label">Username *</label>
+                    <input type="text" name="username" id="editUsername" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="text" name="phone" id="editPhone" class="form-control" required>
+                    <label class="form-label">New Password </label>
+                    <input type="password" name="password" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Contact Phone</label>
+                    <input type="text" name="phone" id="editPhone" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" name="location" id="editLocation" class="form-control">
                 </div>
             </div>
 
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save User Updates</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
             </div>
         </form>
     </div>
@@ -187,14 +243,14 @@
 
 {% block scripts %}
 <script>
-function openEditUserModal(id, fullname, username, category, location, phone) {
-    document.getElementById('editUid').value = id;
-    document.getElementById('editFullname').value = fullname;
-    document.getElementById('editUsername').value = username;
-    document.getElementById('editCategory').value = category;
-    document.getElementById('editLocation').value = location;
-    document.getElementById('editPhone').value = phone;
-    openModal('editUserModal');
-}
+    function openEditUserModal(id, name, uname, cat, phone, loc) {
+        document.getElementById('editUid').value = id;
+        document.getElementById('editFullname').value = name;
+        document.getElementById('editUsername').value = uname;
+        document.getElementById('editCategory').value = cat;
+        document.getElementById('editPhone').value = phone || '';
+        document.getElementById('editLocation').value = loc || 'Dhaka';
+        openModal('editUserModal');
+    }
 </script>
 {% endblock %}

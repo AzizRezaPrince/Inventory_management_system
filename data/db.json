@@ -15,13 +15,363 @@
             "username": "admin",
             "password": "admin",
             "category": "ADMINISTRATOR"
+        },
+        {
+            "fullname": "Tech Sarwar",
+            "username": "tech_sarwar",
+            "password": "tech",
+            "category": "TECHNICIAN",
+            "location": "Dhaka",
+            "phone": "N/A",
+            "id": "1787958891656"
         }
     ],
-    "products": [],
-    "currentstocks": [],
-    "suppliers": [],
-    "customers": [],
-    "purchaseinfo": [],
-    "salesreport": [],
-    "repairs": []
+    "products": [
+        {
+            "productcode": "PRD-1001",
+            "productname": "Samsung LCD TV 32",
+            "brand": "Samsung",
+            "costprice": 15000.0,
+            "sellingprice": 18000.0,
+            "id": "1787945120635"
+        },
+        {
+            "productcode": "TV-29082026-001",
+            "productname": "LG 55 OLED TV",
+            "category": "Smart TV / Display",
+            "brand": "LG",
+            "costprice": 45000.0,
+            "sellingprice": 55000.0,
+            "id": "1787957312399"
+        },
+        {
+            "productcode": "CMP-29082026-001",
+            "productname": "Star Notebook X1",
+            "category": "General Electronics",
+            "brand": "Star",
+            "costprice": 10000.0,
+            "sellingprice": 12000.0,
+            "id": "1787957763035"
+        }
+    ],
+    "currentstocks": [
+        {
+            "productcode": "PRD-1001",
+            "quantity": 8,
+            "id": "1787945120728"
+        },
+        {
+            "productcode": "TV-29082026-001",
+            "quantity": 3,
+            "id": "1787957312503"
+        },
+        {
+            "productcode": "CMP-29082026-001",
+            "quantity": 5,
+            "id": "1787957763094"
+        }
+    ],
+    "suppliers": [
+        {
+            "suppliercode": "SUP-1001",
+            "fullname": "Star Tech",
+            "location": "Dhaka",
+            "phone": "01712345678",
+            "id": "1787957762928"
+        },
+        {
+            "suppliercode": "SUP-1002",
+            "fullname": "LG Store",
+            "location": "Dhaka",
+            "phone": "N/A",
+            "id": "1787958335561"
+        }
+    ],
+    "customers": [
+        {
+            "customercode": "cus954",
+            "fullname": "Test Customer",
+            "location": "Dhaka",
+            "phone": "01711223344",
+            "id": "1787956954544"
+        },
+        {
+            "customercode": "cus639",
+            "fullname": "Rafiq Ahmed",
+            "location": "Dhaka",
+            "phone": "N/A",
+            "id": "1787959639637"
+        }
+    ],
+    "purchaseinfo": [
+        {
+            "suppliercode": "LG Store",
+            "supplier_phone": "N/A",
+            "productcode": "TV-29082026-001",
+            "productname": "LG 55 OLED TV",
+            "category": "Smart TV / Display",
+            "brand": "LG",
+            "quantity": 3,
+            "cost_price": 45000.0,
+            "selling_price": 55000.0,
+            "totalcost": 135000.0,
+            "paid_amount": 100000.0,
+            "due_amount": 35000.0,
+            "payment_status": "Due Pending",
+            "date": "2026-08-29 04:48:32",
+            "logged_by": "Shawon Sarwar",
+            "id": "1787957312564"
+        },
+        {
+            "suppliercode": "Star Tech",
+            "supplier_phone": "01712345678",
+            "productcode": "CMP-29082026-001",
+            "productname": "Star Notebook X1",
+            "category": "General Electronics",
+            "brand": "Star",
+            "quantity": 5,
+            "cost_price": 10000.0,
+            "selling_price": 12000.0,
+            "totalcost": 50000.0,
+            "paid_amount": 15000.0,
+            "due_amount": 35000.0,
+            "payment_status": "Due Pending",
+            "date": "2026-08-29 04:56:03",
+            "logged_by": "Shawon Sarwar",
+            "id": "1787957763184"
+        }
+    ],
+    "salesreport": [
+        {
+            "date": "2026-08-29 01:26:34",
+            "productcode": "PRD-1001",
+            "customercode": "Walk-in Customer",
+            "quantity": 1,
+            "unit_price": 17500.0,
+            "revenue": 17500.0,
+            "soldby": "admin",
+            "id": "1787945194562"
+        },
+        {
+            "id": "SLS-29082026-001",
+            "memo_code": "SLS-29082026-001",
+            "date": "2026-08-29 05:27:19",
+            "productcode": "PRD-1001",
+            "customercode": "Rafiq Ahmed",
+            "quantity": 1,
+            "unit_price": 18000.0,
+            "revenue": 18000.0,
+            "paid_amount": 5000.0,
+            "due_amount": 13000.0,
+            "payment_type": "EMI / Installment",
+            "payment_status": "EMI Active",
+            "emi_months": 6,
+            "monthly_installment": 2166.67,
+            "next_due_date": "2026-09-27",
+            "soldby": "admin"
+        }
+    ],
+    "repairs": [
+        {
+            "id": "SRV-29082026-001",
+            "customer_name": "Test Customer",
+            "customer_phone": "01711223344",
+            "device_type": "Smart TV",
+            "brand_model": "TV-123",
+            "serial_number": "",
+            "issue_description": "Screen damaged",
+            "estimated_cost": 1200.0,
+            "advance_paid": 0.0,
+            "technician": "Shawon Sarwar",
+            "status": "Received",
+            "estimated_delivery": "2026-09-05T15:00",
+            "created_at": "2026-08-29 04:42:34"
+        }
+    ],
+    "expenses": [
+        {
+            "title": "Shop Rent",
+            "category": "Shop Rent (\u09a6\u09cb\u0995\u09be\u09a8 \u09ad\u09be\u09dc\u09be)",
+            "amount": 10000.0,
+            "date": "2026-08-29 00:47:44",
+            "notes": "",
+            "created_by": "Shawon Sarwar",
+            "is_auto": false,
+            "id": "1787942864029"
+        },
+        {
+            "title": "Utility Bill",
+            "category": "Utility Bills (\u0987\u0989\u099f\u09bf\u09b2\u09bf\u099f\u09bf \u09ac\u09bf\u09b2)",
+            "amount": 1500.0,
+            "date": "2026-08-29 00:49:29",
+            "notes": "",
+            "created_by": "Shawon Sarwar",
+            "is_auto": false,
+            "id": "1787942969429"
+        },
+        {
+            "title": "wifi bill",
+            "category": "Utility Bills (\u0987\u0989\u099f\u09bf\u09b2\u09bf\u099f\u09bf \u09ac\u09bf\u09b2)",
+            "amount": 1000.0,
+            "date": "2026-08-29T00:52",
+            "notes": "paid in upai",
+            "created_by": "Shawon Sarwar",
+            "is_auto": false,
+            "id": "1787943186265"
+        },
+        {
+            "title": "Stock Purchase (3 units x LG 55 OLED TV)",
+            "category": "Stock Purchase (\u09b8\u09cd\u099f\u0995 \u0995\u09cd\u09b0\u09df)",
+            "amount": 100000.0,
+            "date": "2026-08-29 04:48:32",
+            "reference_id": "1787957312564",
+            "notes": "Supplier: LG Store | Total: Tk 135000.00, Paid: Tk 100000.00, Due: Tk 35000.00",
+            "created_by": "Shawon Sarwar",
+            "is_auto": true,
+            "id": "1787957312628"
+        },
+        {
+            "title": "Stock Purchase (5 units x Star Notebook X1)",
+            "category": "Stock Purchase (\u09b8\u09cd\u099f\u0995 \u0995\u09cd\u09b0\u09df)",
+            "amount": 15000.0,
+            "date": "2026-08-29 04:56:03",
+            "reference_id": "1787957763184",
+            "notes": "Supplier: Star Tech | Total: Tk 50000.00, Paid: Tk 15000.00, Due: Tk 35000.00",
+            "created_by": "Shawon Sarwar",
+            "is_auto": true,
+            "id": "1787957763246"
+        }
+    ],
+    "activity_logs": [
+        {
+            "date": "2026-08-29 05:12:50",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGOUT",
+            "title": "User Signed Out",
+            "description": "Shawon Sarwar logged out.",
+            "target_ref": "",
+            "id": "1787958770174"
+        },
+        {
+            "date": "2026-08-29 05:13:37",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGIN",
+            "title": "User Signed In",
+            "description": "Shawon Sarwar (ADMINISTRATOR) logged in successfully.",
+            "target_ref": "",
+            "id": "1787958817909"
+        },
+        {
+            "date": "2026-08-29 05:14:51",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "USER_ADD",
+            "title": "Added New TECHNICIAN Modified",
+            "description": "Admin created account for Tech Sarwar (tech_sarwar) as TECHNICIAN",
+            "target_ref": "",
+            "id": "1787958891792"
+        },
+        {
+            "date": "2026-08-29 05:15:40",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOG_EDIT",
+            "title": "Edited Activity Log #1787958891792",
+            "description": "Admin edited log details for Shawon Sarwar",
+            "target_ref": "",
+            "id": "1787958940707"
+        },
+        {
+            "date": "2026-08-29 05:20:43",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGOUT",
+            "title": "User Signed Out",
+            "description": "Shawon Sarwar logged out.",
+            "target_ref": "",
+            "id": "1787959243550"
+        },
+        {
+            "date": "2026-08-29 05:21:31",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGIN",
+            "title": "User Signed In",
+            "description": "Shawon Sarwar (ADMINISTRATOR) logged in successfully.",
+            "target_ref": "",
+            "id": "1787959291682"
+        },
+        {
+            "date": "2026-08-29 05:24:09",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGOUT",
+            "title": "User Signed Out",
+            "description": "Shawon Sarwar logged out.",
+            "target_ref": "",
+            "id": "1787959449680"
+        },
+        {
+            "date": "2026-08-29 05:24:29",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGIN",
+            "title": "User Signed In",
+            "description": "Shawon Sarwar (ADMINISTRATOR) logged in successfully.",
+            "target_ref": "",
+            "id": "1787959469794"
+        },
+        {
+            "date": "2026-08-29 05:27:19",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "SALE_LOG",
+            "title": "Processed Sale Memo #SLS-29082026-001",
+            "description": "Sold 1 units of PRD-1001 to Rafiq Ahmed (Total: Tk 18000.00, Paid: Tk 5000.00, Due: Tk 13000.00)",
+            "target_ref": "SLS-29082026-001",
+            "id": "1787959640046"
+        },
+        {
+            "date": "2026-08-29 05:30:58",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGOUT",
+            "title": "User Signed Out",
+            "description": "Shawon Sarwar logged out.",
+            "target_ref": "",
+            "id": "1787959858699"
+        },
+        {
+            "date": "2026-08-29 05:32:07",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGIN",
+            "title": "User Signed In",
+            "description": "Shawon Sarwar (ADMINISTRATOR) logged in successfully.",
+            "target_ref": "",
+            "id": "1787959927984"
+        },
+        {
+            "date": "2026-08-30 03:33:10",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGOUT",
+            "title": "User Signed Out",
+            "description": "Shawon Sarwar logged out.",
+            "target_ref": "",
+            "id": "1788039190936"
+        },
+        {
+            "date": "2026-08-30 03:33:52",
+            "user": "Shawon Sarwar",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGIN",
+            "title": "User Signed In",
+            "description": "Shawon Sarwar (ADMINISTRATOR) logged in successfully.",
+            "target_ref": "",
+            "id": "1788039232083"
+        }
+    ]
 }

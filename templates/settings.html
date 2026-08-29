@@ -5,18 +5,17 @@
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">Settings & Profile Management</h1>
-        <p class="page-subtitle">Configure project/shop branding, phone numbers, and administrator profile information.</p>
+        <h1 class="page-title">Settings & Profile</h1>
     </div>
 </div>
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
 
-    <!-- Card 1: Shop & Project Branding Settings (Admin Only) -->
+    <!-- Card 1: Shop & Project Settings (Admin Only) -->
     <div class="content-card">
         <div class="card-header-actions">
             <h2 class="card-title">
-                <i class="fa-solid fa-store" style="color: var(--accent-blue);"></i> Shop & Project Branding
+                <i class="fa-solid fa-store" style="color: var(--accent-blue);"></i> Shop Settings
             </h2>
         </div>
 
@@ -25,34 +24,38 @@
             <input type="hidden" name="action" value="update_shop_settings">
 
             <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-heading"></i> Project / Shop Name</label>
-                <input type="text" name="shop_name" class="form-control" value="{{ shop_settings.shop_name }}" placeholder="e.g. ElectroIMS / Shawon Electronics" required>
+                <label class="form-label"><i class="fa-solid fa-heading"></i>Shop Name</label>
+                <input type="text" name="shop_name" class="form-control" value="{{ shop_settings.shop_name }}"
+                    placeholder="e.g. ElectroIMS / Shawon Electronics" required>
             </div>
 
             <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-tag"></i> Shop Tagline / Subtitle</label>
-                <input type="text" name="shop_tagline" class="form-control" value="{{ shop_settings.shop_tagline }}" placeholder="e.g. Shop & Repair Hub" required>
+                <label class="form-label"><i class="fa-solid fa-tag"></i> Shop Tagline</label>
+                <input type="text" name="shop_tagline" class="form-control" value="{{ shop_settings.shop_tagline }}"
+                    placeholder="e.g. Shop & Repair Hub" required>
             </div>
 
             <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-phone"></i> Shop Phone (Appears on Receipts)</label>
-                <input type="text" name="shop_phone" class="form-control" value="{{ shop_settings.shop_phone }}" placeholder="e.g. 01700000000" required>
+                <label class="form-label"><i class="fa-solid fa-phone"></i> Shop Phone</label>
+                <input type="text" name="shop_phone" class="form-control" value="{{ shop_settings.shop_phone }}"
+                    placeholder="e.g. 01700000000" required>
             </div>
 
             <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-location-dot"></i> Shop Address (Appears on Receipts)</label>
-                <input type="text" name="shop_address" class="form-control" value="{{ shop_settings.shop_address }}" placeholder="e.g. Dhaka, Bangladesh" required>
+                <label class="form-label"><i class="fa-solid fa-location-dot"></i> Shop Address </label>
+                <input type="text" name="shop_address" class="form-control" value="{{ shop_settings.shop_address }}"
+                    placeholder="e.g. Dhaka, Bangladesh" required>
             </div>
 
             <div style="margin-top: 1.5rem; text-align: right;">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-floppy-disk"></i> Save Shop Settings
+                    <i class="fa-solid fa-floppy-disk"></i> Save Settings
                 </button>
             </div>
         </form>
         {% else %}
         <p style="color: var(--text-muted); font-size: 0.9rem;">
-            Only Administrators can change the shop branding name and address.
+            Only Admin can change the shop settings.
         </p>
         {% endif %}
     </div>
@@ -61,7 +64,7 @@
     <div class="content-card">
         <div class="card-header-actions">
             <h2 class="card-title">
-                <i class="fa-solid fa-user-gear" style="color: var(--accent-purple);"></i> My Profile & Password
+                <i class="fa-solid fa-user-gear" style="color: var(--accent-purple);"></i> Profile & Password
             </h2>
         </div>
 
@@ -70,16 +73,18 @@
 
             <div class="form-group">
                 <label class="form-label"><i class="fa-solid fa-id-card"></i> Full Name</label>
-                <input type="text" name="fullname" class="form-control" value="{{ user.fullname if user else session.get('fullname') }}" required>
+                <input type="text" name="fullname" class="form-control"
+                    value="{{ user.fullname if user else session.get('fullname') }}" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label"><i class="fa-solid fa-user"></i> Username</label>
-                <input type="text" name="username" class="form-control" value="{{ user.username if user else session.get('username') }}" required>
+                <input type="text" name="username" class="form-control"
+                    value="{{ user.username if user else session.get('username') }}" required>
             </div>
 
             <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-key"></i> New Password (Leave blank to keep current)</label>
+                <label class="form-label"><i class="fa-solid fa-key"></i> New Password</label>
                 <input type="password" name="password" class="form-control" placeholder="••••••••">
             </div>
 

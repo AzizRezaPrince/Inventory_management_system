@@ -5,21 +5,20 @@
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">Electronics Repair & Service Hub</h1>
-        <p class="page-subtitle">Track repairs for TVs, Laptops, Computers, Mobiles, and Electronic Components.</p>
+        <h1 class="page-title">Electronics Repair & Service</h1>
     </div>
     <div>
         <button class="btn btn-primary" onclick="openModal('addRepairModal')">
-            <i class="fa-solid fa-plus"></i> Create Repair Ticket
+            <i class="fa-solid fa-plus"></i> Add New Service
         </button>
     </div>
 </div>
 
 <div class="content-card">
     <div class="card-header-actions">
-        <input type="text" id="repairSearch" class="form-control" placeholder="🔍 Search repair tickets by ID, customer name, device or phone..." style="max-width: 380px;" onkeyup="filterTable('repairSearch', 'repairsTable')">
+        <input type="text" id="repairSearch" class="form-control" placeholder="Search Service by ID, customer name, device or phone..." style="max-width: 380px;" onkeyup="filterTable('repairSearch', 'repairsTable')">
         <div>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Total Tickets: <strong>{{ repairs|length }}</strong></span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Total Service: <strong>{{ repairs|length }}</strong></span>
         </div>
     </div>
 
@@ -27,20 +26,20 @@
         <table id="repairsTable">
             <thead>
                 <tr>
-                    <th>Ticket ID</th>
+                    <th>Service ID</th>
                     <th>Customer & Contact</th>
                     <th>Device & Issue</th>
                     <th>Est. Cost</th>
-                    <th>Advance / Due</th>
+                    <th>Paid / Balance Due</th>
                     <th>Status</th>
-                    <th>Delivery Date</th>
+                    <th>Est. Delivery</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for r in repairs %}
-                {% set balance = r.estimated_cost - r.advance_paid %}
-                {% set due_color = 'var(--accent-rose)' if balance > 0 else 'var(--text-muted)' %}
+                    {% set balance = r.estimated_cost - r.advance_paid %}
+                    {% set due_color = 'var(--accent-rose)' if balance > 0 else 'var(--accent-emerald)' %}
                 <tr>
                     <td><strong>{{ r.id }}</strong></td>
                     <td>
@@ -100,10 +99,10 @@
                                 title="Update Status & Billing">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <form action="{{ url_for('repairs') }}" method="POST" onsubmit="return confirm('Delete repair ticket {{ r.id }}?')" style="display:inline;">
+                            <form action="{{ url_for('repairs') }}" method="POST" onsubmit="return confirm('Delete Service {{ r.id }}?')" style="display:inline;">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="ticket_id" value="{{ r.id }}">
-                                <button type="submit" class="btn btn-danger btn-sm" title="Delete Ticket">
+                                <button type="submit" class="btn btn-danger btn-sm" title="Delete Service">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
@@ -113,7 +112,7 @@
                 {% else %}
                 <tr>
                     <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                        No repair tickets recorded yet. Click <strong>Create Repair Ticket</strong> to add one!
+                        No repair tickets recorded yet. Click <strong>Add New Service</strong> to add one!
                     </td>
                 </tr>
                 {% endfor %}
@@ -126,7 +125,7 @@
 <div class="modal-overlay" id="addRepairModal">
     <div class="modal-box">
         <div class="modal-header">
-            <h3 class="card-title"><i class="fa-solid fa-screwdriver-wrench" style="color:var(--accent-purple);"></i> New Electronics Repair Ticket</h3>
+            <h3 class="card-title"><i class="fa-solid fa-screwdriver-wrench" style="color:var(--accent-purple);"></i> Add New Service</h3>
             <button class="modal-close" onclick="closeModal('addRepairModal')">&times;</button>
         </div>
         <form action="{{ url_for('repairs') }}" method="POST">
@@ -135,11 +134,11 @@
             <div class="form-grid-2">
                 <div class="form-group">
                     <label class="form-label">Customer Name</label>
-                    <input type="text" name="customer_name" class="form-control" placeholder="e.g. Rahim Ahmed" required>
+                    <input type="text" name="customer_name" class="form-control" placeholder="e.g. Abdul Latif" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Customer Phone (Optional)</label>
-                    <input type="text" name="customer_phone" class="form-control" placeholder="e.g. 01700000000">
+                    <input type="text" name="customer_phone" class="form-control" placeholder="e.g. 01812345678">
                 </div>
             </div>
 
@@ -147,65 +146,59 @@
                 <div class="form-group">
                     <label class="form-label">Device Type</label>
                     <select name="device_type" class="form-select" required>
-                        <option value="Smart TV">Smart TV / Monitor</option>
+                        <option value="Smart TV">Smart TV / LED TV</option>
                         <option value="Laptop">Laptop / Notebook</option>
-                        <option value="Desktop PC">Desktop Computer</option>
-                        <option value="Smartphone">Smartphone / Tablet</option>
-                        <option value="Audio System">Speaker / Audio Receiver</option>
-                        <option value="Other Component">Other Electronics Component</option>
+                        <option value="Desktop PC">Desktop PC / Computer</option>
+                        <option value="Mobile Phone">Mobile Phone / Tablet</option>
+                        <option value="Audio System">Audio System / Speaker</option>
+                        <option value="Component Repair">Circuit Board / Component</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Brand & Model</label>
-                    <input type="text" name="brand_model" class="form-control" placeholder="e.g. Samsung 55 UHD / SM 26 ultra">
+                    <input type="text" name="brand_model" class="form-control" placeholder="e.g. LG 32 Smart TV / HP 15 Gen 12">
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Serial Number (Optional)</label>
-                <input type="text" name="serial_number" class="form-control" placeholder="e.g. SN-991823">
+                <input type="text" name="serial_number" class="form-control" placeholder="Device Serial # or IMEI">
             </div>
 
             <div class="form-group">
-                <label class="form-label">Problem / Defect Description</label>
-                <textarea name="issue_description" class="form-control" rows="2" placeholder="Describe the fault (e.g. Power light flickering, no display, sound distorted)..." required></textarea>
+                <label class="form-label">Problem Description</label>
+                <textarea name="issue_description" class="form-control" rows="2" placeholder="Describe the fault (e.g. Power light flickering, or No display)" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Estimated Cost (Tk)</label>
+                <input type="number" step="0.01" name="estimated_cost" class="form-control" placeholder="0.00" value="0">
             </div>
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Estimated Repair Cost (Tk)</label>
-                    <input type="number" step="0.01" name="estimated_cost" class="form-control" placeholder="0.00" value="0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Advance Deposit Paid (Tk)</label>
-                    <input type="number" step="0.01" name="advance_paid" class="form-control" placeholder="0.00" value="0">
-                </div>
-            </div>
-
-            <div class="form-grid-2">
-                <div class="form-group">
-                    <label class="form-label">Assigned Technician</label>
+                    <label class="form-label">Service By</label>
                     <input type="text" name="technician" class="form-control" value="{{ session.get('fullname') }}">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Estimated Delivery Date & Time</label>
+                    <label class="form-label">Delivery Date & Time</label>
                     <input type="datetime-local" name="estimated_delivery" class="form-control">
                 </div>
             </div>
 
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('addRepairModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create Ticket & Print Receipt</button>
+                <button type="submit" class="btn btn-primary">Print Receipt</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal: Update Status & Payment -->
+<!-- Modal: Update Status -->
 <div class="modal-overlay" id="updateRepairModal">
     <div class="modal-box">
         <div class="modal-header">
-            <h3 class="card-title">Update Repair Status (<span id="upTicketIdText"></span>)</h3>
+            <h3 class="card-title">Update Service Status (<span id="upTicketIdText"></span>)</h3>
             <button class="modal-close" onclick="closeModal('updateRepairModal')">&times;</button>
         </div>
         <form action="{{ url_for('repairs') }}" method="POST">
@@ -213,25 +206,25 @@
             <input type="hidden" name="ticket_id" id="upTicketId">
 
             <div class="form-group">
-                <label class="form-label">Repair Status</label>
+                <label class="form-label">Status</label>
                 <select name="status" id="upStatus" class="form-select" required>
                     <option value="Received">Received</option>
                     <option value="Diagnosing">Diagnosing</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Waiting for Parts">Waiting for Parts</option>
-                    <option value="Ready for Delivery">Ready for Delivery / Pickup</option>
-                    <option value="Delivered">Delivered & Completed</option>
-                    <option value="Cancelled">Cancelled / Unrepairable</option>
+                    <option value="Ready for Delivery">Ready for Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
                 </select>
             </div>
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Add Additional Cost / Parts Charge (Tk)</label>
+                    <label class="form-label">Add Cost (Tk)</label>
                     <input type="number" step="0.01" name="additional_cost" class="form-control" value="0">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Add Payment Received (Tk)</label>
+                    <label class="form-label">Payment Received (Tk)</label>
                     <input type="number" step="0.01" name="additional_paid" class="form-control" value="0">
                 </div>
             </div>
@@ -248,11 +241,11 @@
 <div class="modal-overlay" id="receiptModal">
     <div class="modal-box" style="max-width: 550px;">
         <div class="modal-header">
-            <h3 class="card-title"><i class="fa-solid fa-receipt"></i> Printable Repair Receipt</h3>
+            <h3 class="card-title"><i class="fa-solid fa-receipt"></i> Printable Service Receipt</h3>
             <button class="modal-close" onclick="closeModal('receiptModal')">&times;</button>
         </div>
         <div id="receiptModalBody">
-            <!-- Dynamically populated JS -->
+            <!-- Populated dynamically via JS -->
         </div>
         <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
             <button class="btn btn-secondary" onclick="closeModal('receiptModal')">Close</button>
@@ -260,7 +253,6 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Electronics Shop Inventory & Repair Management System Loaded.");
+    console.log(" ");
 
     // Flash Alert Dismissal
     const alerts = document.querySelectorAll('.alert');
@@ -51,10 +51,10 @@ function filterTable(inputId, tableId) {
 function printRepairReceipt(id, customer, phone, device, problem, cost, advance, status, delivery, date) {
     const balance = (parseFloat(cost) - parseFloat(advance)).toFixed(2);
     const shop = window.SHOP_SETTINGS || {
-        name: 'ElectroIMS',
-        tagline: 'Electronics Shop & Repair Hub',
+        name: 'SS Technology',
+        tagline: 'Electronics Shop & Repair Center',
         phone: '01700000000',
-        address: 'Dhaka, Bangladesh'
+        address: 'Club Super Market 2nd FloorChapainawabganj'
     };
 
     const receiptHTML = `
@@ -67,7 +67,7 @@ function printRepairReceipt(id, customer, phone, device, problem, cost, advance,
             </div>
             
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem; font-weight: bold;">
-                <span>Ticket #: ${id}</span>
+                <span>Servicing Memo #: ${id}</span>
                 <span>Date: ${date}</span>
             </div>
             
@@ -90,25 +90,26 @@ function printRepairReceipt(id, customer, phone, device, problem, cost, advance,
                     <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">Tk ${parseFloat(cost).toFixed(2)}</td>
                 </tr>
                 <tr>
-                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Advance Paid Deposit</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Advance Paid</td>
                     <td style="padding: 8px; border: 1px solid #ddd; text-align: right; color: green; font-weight: bold;">-Tk ${parseFloat(advance).toFixed(2)}</td>
                 </tr>
                 <tr style="background: #f9f9f9;">
-                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1rem;">Balance Due at Delivery</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; font-size: 1rem;">Balance Due</td>
                     <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1rem; color: red;">Tk ${balance}</td>
                 </tr>
             </table>
 
-            <div style="margin-top: 35px; display: flex; justify-content: space-between; text-align: center; font-size: 0.85rem;">
-                <div>
+            <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.85rem;">
+                <div style="text-align: center;">
                     <br><br>
                     ______________________<br>
                     Customer Signature
                 </div>
-                <div>
-                    <br><br>
-                    ______________________<br>
-                    Authorized Technician
+                <div style="text-align: center;">
+                    <div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.35rem; color: #1e3a8a; font-weight: bold; font-style: italic; border-bottom: 2px dashed #1e3a8a; padding: 0 10px; display: inline-block;">
+                        ${shop.name} Auth
+                    </div>
+                    <div style="font-size: 0.8rem; font-weight: bold; color: #333; margin-top: 3px;">Authorized Technician</div>
                 </div>
             </div>
             
@@ -123,14 +124,18 @@ function printRepairReceipt(id, customer, phone, device, problem, cost, advance,
     }
 }
 
-// Product Sales Cash Memo Invoice Printer (Bangladeshi Taka)
-function printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPrice, revenue, soldBy) {
+// Product Sales Cash Memo Invoice Printer (Bangladeshi Taka & EMI Support)
+function printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPrice, revenue, soldBy, paidAmount, dueAmount, paymentType, paymentStatus, emiMonths, monthlyInstallment, nextDueDate) {
     const shop = window.SHOP_SETTINGS || {
-        name: 'ElectroIMS',
-        tagline: 'Electronics Shop & Repair Hub',
+        name: 'SS Technology',
+        tagline: 'Electronics Shop & Repair Center',
         phone: '01700000000',
-        address: 'Dhaka, Bangladesh'
+        address: 'Club Super Market 2nd Floor,Chapainawabganj'
     };
+
+    const formattedSaleId = String(saleId).startsWith('SLS-') ? saleId : `SLS-${saleId}`;
+    const paid = parseFloat(paidAmount !== undefined && paidAmount !== null && paidAmount !== '' ? paidAmount : revenue);
+    const due = parseFloat(dueAmount !== undefined && dueAmount !== null && dueAmount !== '' ? dueAmount : 0);
 
     const receiptHTML = `
         <div id="printableReceipt" style="font-family: Arial, sans-serif; color: #111; padding: 20px; border: 2px solid #333; max-width: 520px; margin: auto; background: #fff;">
@@ -142,7 +147,7 @@ function printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPr
             </div>
             
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem;">
-                <span><strong>Invoice #:</strong> INV-${saleId}</span>
+                <span><strong>Sales Memo #:</strong> ${formattedSaleId}</span>
                 <span><strong>Date:</strong> ${date}</span>
             </div>
             
@@ -170,22 +175,41 @@ function printSalesReceipt(saleId, date, pcode, pname, cname, ccode, qty, unitPr
                         <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold;">Tk ${parseFloat(revenue).toFixed(2)}</td>
                     </tr>
                     <tr style="background: #f9f9f9;">
-                        <td colspan="3" style="padding: 10px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1rem;">Total Net Amount Paid:</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1.1rem; color: #10b981;">Tk ${parseFloat(revenue).toFixed(2)}</td>
+                        <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 0.95rem;">Total Bill Amount:</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; font-size: 1rem;">Tk ${parseFloat(revenue).toFixed(2)}</td>
                     </tr>
+                    <tr>
+                        <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; color: green; font-size: 0.95rem;">Paid Amount Today:</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; color: green; font-size: 1rem;">Tk ${paid.toFixed(2)}</td>
+                    </tr>
+                    ${due > 0 ? `
+                    <tr style="background: #fff0f0;">
+                        <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; color: red; font-size: 0.95rem;">Remaining Due Balance:</td>
+                        <td style="padding: 8px; border: 1px solid #ddd; text-align: right; font-weight: bold; color: red; font-size: 1rem;">Tk ${due.toFixed(2)}</td>
+                    </tr>
+                    ` : ''}
                 </tbody>
             </table>
 
-            <div style="margin-top: 35px; display: flex; justify-content: space-between; text-align: center; font-size: 0.85rem;">
-                <div>
+            ${paymentType === 'EMI / Installment' ? `
+            <div style="margin-top: 15px; padding: 10px; background: rgba(168, 85, 247, 0.08); border: 1px dashed #a855f7; border-radius: 6px; font-size: 0.82rem; color: #4c1d95;">
+                <strong style="font-size: 0.88rem; text-transform: uppercase;"> EMI / Installment Plan Details:</strong><br>
+                <span>Plan Tenure: <strong>${emiMonths || 6} Months</strong> | Monthly Installment: <strong style="color: #7e22ce;">Tk ${parseFloat(monthlyInstallment || 0).toFixed(2)}</strong></span><br>
+                <span>Next Installment Due Date: <strong>${nextDueDate || 'TBD'}</strong></span>
+            </div>
+            ` : ''}
+
+            <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.85rem;">
+                <div style="text-align: center;">
                     <br><br>
                     ______________________<br>
                     Customer Signature
                 </div>
-                <div>
-                    <br><br>
-                    ______________________<br>
-                    Authorized Seller
+                <div style="text-align: center;">
+                    <div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.35rem; color: #10b981; font-weight: bold; font-style: italic; border-bottom: 2px dashed #10b981; padding: 0 10px; display: inline-block;">
+                        ${shop.name} Sales
+                    </div>
+                    <div style="font-size: 0.8rem; font-weight: bold; color: #333; margin-top: 3px;">Authorized Seller</div>
                 </div>
             </div>
             

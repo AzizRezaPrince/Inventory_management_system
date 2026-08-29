@@ -1,25 +1,53 @@
 {% extends "base.html" %}
 
-{% block title %}Suppliers - ElectroIMS{% endblock %}
+{% block title %}Supplier Directory & Accounts - {{ shop_settings.shop_name }}{% endblock %}
 
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">Supplier Directory</h1>
-        <p class="page-subtitle">Manage wholesale suppliers for electronics, TV parts, and components.</p>
+        <h1 class="page-title"><i class="fa-solid fa-truck-field" style="color: var(--accent-blue);"></i> Supplier
+            Directory & Accounts</h1>
+        <!-- <p class="page-subtitle">Auto-synced suppliers from stock purchases, contact info, purchase history, and supplier due balances.</p> -->
     </div>
     <div>
         <button class="btn btn-primary" onclick="openModal('addSupplierModal')">
-            <i class="fa-solid fa-plus"></i> Add Supplier
+            <i class="fa-solid fa-plus"></i> Add New Supplier
         </button>
+    </div>
+</div>
+
+<!-- Supplier Metrics Cards -->
+<div class="metrics-grid" style="margin-bottom: 2rem;">
+    <div class="metric-card" style="border-left: 4px solid var(--accent-blue);">
+        <div class="metric-icon blue">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="metric-details">
+            <h3>{{ suppliers|length }}</h3>
+            <p>Total Registered Suppliers</p>
+            <small style="color: var(--text-muted); font-size: 0.78rem;">Total Suppliers</small>
+        </div>
+    </div>
+
+    <div class="metric-card" style="border-left: 4px solid var(--accent-rose);">
+        <div class="metric-icon rose">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+        </div>
+        <div class="metric-details">
+            <h3>Tk {{ "%.2f"|format(total_due_all) }}</h3>
+            <p>Total Supplier Dues</p>
+            <small style="color: var(--accent-rose); font-weight: 600; font-size: 0.78rem;">Total Payable Dues</small>
+        </div>
     </div>
 </div>
 
 <div class="content-card">
     <div class="card-header-actions">
-        <input type="text" id="supplierSearch" class="form-control" placeholder="🔍 Search suppliers by code, name or location..." style="max-width: 380px;" onkeyup="filterTable('supplierSearch', 'suppliersTable')">
+        <input type="text" id="supplierSearch" class="form-control" placeholder="Search" style="max-width: 380px;"
+            onkeyup="filterTable('supplierSearch', 'suppliersTable')">
         <div>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Total Suppliers: <strong>{{ suppliers|length }}</strong></span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Total Suppliers: <strong>{{ suppliers|length
+                    }}</strong></span>
         </div>
     </div>
 
@@ -27,22 +55,42 @@
         <table id="suppliersTable">
             <thead>
                 <tr>
-                    <th>Supplier Code</th>
-                    <th>Full Name</th>
-                    <th>Location</th>
-                    <th>Phone Number</th>
-                    <th>Actions</th>
+                    <th>Supplier Code & Name</th>
+                    <th>Contact Phone</th>
+                    <th>Location / Address</th>
+                    <th>Total Intakes</th>
+                    <th>Business Volume (Tk)</th>
+                    <th>Paid Amount</th>
+                    <th>Outstanding Dues</th>
+                    <th style="text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for s in suppliers %}
                 <tr>
-                    <td><code>{{ s.suppliercode }}</code></td>
-                    <td><strong>{{ s.fullname }}</strong></td>
-                    <td>{{ s.location }}</td>
-                    <td><i class="fa-solid fa-phone"></i> {{ s.phone }}</td>
                     <td>
-                        <form action="{{ url_for('suppliers') }}" method="POST" onsubmit="return confirm('Delete supplier {{ s.fullname }}?')" style="display:inline;">
+                        <strong>{{ s.fullname }}</strong><br>
+                        <code>{{ s.suppliercode }}</code>
+                    </td>
+                    <td><i class="fa-solid fa-phone" style="color: var(--accent-blue);"></i> {{ s.phone }}</td>
+                    <td>{{ s.location }}</td>
+                    <td><span class="badge badge-received">{{ s.intake_count }}</span></td>
+                    <td><strong>Tk {{ "%.2f"|format(s.total_volume) }}</strong></td>
+                    <td><span style="color: var(--accent-emerald); font-weight: 600;">Tk {{ "%.2f"|format(s.total_paid)
+                            }}</span></td>
+                    <td>
+                        {% if s.total_due and s.total_due > 0 %}
+                        <span class="badge"
+                            style="background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.3);">
+                            Due: Tk {{ "%.2f"|format(s.total_due) }}
+                        </span>
+                        {% else %}
+                        <span class="badge badge-delivered">No Due</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        <form action="{{ url_for('suppliers') }}" method="POST"
+                            onsubmit="return confirm('Delete supplier {{ s.fullname }}?')" style="display:inline;">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="sid" value="{{ s.id }}">
                             <button type="submit" class="btn btn-danger btn-sm">
@@ -53,7 +101,8 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No suppliers recorded.</td>
+                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">No suppliers
+                        recorded.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -65,31 +114,33 @@
 <div class="modal-overlay" id="addSupplierModal">
     <div class="modal-box">
         <div class="modal-header">
-            <h3 class="card-title">Add Supplier</h3>
+            <h3 class="card-title"><i class="fa-solid fa-truck-field" style="color: var(--accent-blue);"></i> Add New
+                Supplier</h3>
             <button class="modal-close" onclick="closeModal('addSupplierModal')">&times;</button>
         </div>
         <form action="{{ url_for('suppliers') }}" method="POST">
             <input type="hidden" name="action" value="add">
-            
+
             <div class="form-grid-2">
                 <div class="form-group">
                     <label class="form-label">Supplier Code</label>
-                    <input type="text" name="suppliercode" class="form-control" placeholder="e.g. sup10" required>
+                    <input type="text" name="suppliercode" class="form-control" value="{{ next_supplier_code }}"
+                        placeholder="{{ next_supplier_code }}" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Full Name / Business Name</label>
-                    <input type="text" name="fullname" class="form-control" placeholder="e.g. Ram Electronics Wholesalers" required>
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" name="fullname" class="form-control" placeholder="e.g. Star Tech" required>
                 </div>
             </div>
 
             <div class="form-grid-2">
                 <div class="form-group">
-                    <label class="form-label">Location / Address</label>
-                    <input type="text" name="location" class="form-control" placeholder="e.g. Kathmandu" required>
+                    <label class="form-label">Location</label>
+                    <input type="text" name="location" class="form-control" placeholder="e.g. IDB Bhaban, Dhaka">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="text" name="phone" class="form-control" placeholder="e.g. 9841234567" required>
+                    <label class="form-label">Phone Number *</label>
+                    <input type="text" name="phone" class="form-control" placeholder="e.g. 01700000000" required>
                 </div>
             </div>
 

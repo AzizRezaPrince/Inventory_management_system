@@ -248,22 +248,34 @@ class DatabaseManager:
             'phone': phone or 'N/A'
         })
 
-    def ensure_supplier_exists(self, supplier_name):
+    def ensure_supplier_exists(self, supplier_name, phone="N/A", location="Dhaka"):
         if not supplier_name or supplier_name.strip().lower() == "general supplier":
             return
         sname = supplier_name.strip()
         suppliers = self.get_collection('suppliers')
         for s in suppliers:
             if s.get('fullname', '').strip().lower() == sname.lower():
+                if phone and phone != "N/A" and (s.get('phone') == "N/A" or not s.get('phone')):
+                    self.update_doc('suppliers', s.get('id'), {'phone': phone, 'location': location or 'Dhaka'})
                 return
         
-        # Create new supplier record dynamically
-        scode = f"sup{int(time.time()) % 1000}"
+        # Create new supplier record dynamically with auto code
+        existing_codes = [s.get('suppliercode', '') for s in suppliers]
+        max_num = 1000
+        for code in existing_codes:
+            if str(code).startswith('SUP-'):
+                try:
+                    num = int(str(code).split('SUP-')[1])
+                    if num > max_num: max_num = num
+                except ValueError:
+                    pass
+        scode = f"SUP-{max_num + 1}"
+
         self.add_doc('suppliers', {
             'suppliercode': scode,
             'fullname': sname,
-            'location': 'Dhaka',
-            'phone': 'N/A'
+            'location': location or 'Dhaka',
+            'phone': phone or 'N/A'
         })
 
     def authenticate_user(self, username, password):

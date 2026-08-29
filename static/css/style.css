@@ -38,6 +38,13 @@ body {
     display: flex;
     width: 100%;
     min-height: 100vh;
+    flex-direction: column;
+}
+
+@media (min-width: 993px) {
+    .app-wrapper {
+        flex-direction: row;
+    }
 }
 
 .sidebar {
@@ -47,9 +54,12 @@ body {
     display: flex;
     flex-direction: column;
     position: fixed;
+    top: 0;
+    left: 0;
     height: 100vh;
-    z-index: 100;
+    z-index: 1000;
     padding: 1.5rem 1rem;
+    overflow-y: auto;
 }
 
 .sidebar-brand {
@@ -71,6 +81,7 @@ body {
     justify-content: center;
     font-size: 1.25rem;
     color: #fff;
+    flex-shrink: 0;
 }
 
 .brand-title {
@@ -148,6 +159,46 @@ body {
     background: rgba(244, 63, 94, 0.1);
 }
 
+/* --- Mobile Navigation Header --- */
+.mobile-header {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    background: #0f172a;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.mobile-toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 998;
+    display: none;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
 /* --- Main Content Area --- */
 .main-content {
     margin-left: var(--sidebar-width);
@@ -155,6 +206,7 @@ body {
     padding: 2rem;
     background: #0b1120;
     min-height: 100vh;
+    width: 100%;
 }
 
 .top-bar {
@@ -207,12 +259,14 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
+    flex-shrink: 0;
 }
 
 .metric-icon.blue { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
 .metric-icon.emerald { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
 .metric-icon.amber { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
 .metric-icon.purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); }
+.metric-icon.rose { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
 
 .metric-details h3 {
     font-size: 1.6rem;
@@ -257,6 +311,7 @@ body {
     border: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     transition: all 0.2s ease;
     text-decoration: none;
@@ -302,12 +357,14 @@ body {
 .table-responsive {
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
+    white-space: nowrap;
 }
 
 th {
@@ -389,7 +446,7 @@ tr:hover td {
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 2000;
 }
 
 .modal-overlay.active {
@@ -400,9 +457,9 @@ tr:hover td {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    width: 90%;
-    max-width: 600px;
-    padding: 2rem;
+    width: 92%;
+    max-width: 650px;
+    padding: 1.75rem;
     box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     max-height: 90vh;
     overflow-y: auto;
@@ -431,6 +488,12 @@ tr:hover td {
     gap: 1rem;
 }
 
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+}
+
 /* Flash Messages */
 .alert-container {
     margin-bottom: 1.5rem;
@@ -449,6 +512,114 @@ tr:hover td {
 .alert-success { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
 .alert-danger { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.3); }
 .alert-warning { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+/* --- Media Queries for Tablets & Mobile Screens --- */
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar.mobile-active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1.25rem;
+    }
+
+    .mobile-header {
+        display: flex;
+    }
+
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .top-bar > div:last-child {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .top-bar .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .metrics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .main-content {
+        padding: 0.85rem;
+    }
+
+    .page-title {
+        font-size: 1.35rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .form-grid-2, .form-grid-3 {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem;
+    }
+
+    .card-header-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .card-header-actions input {
+        max-width: 100% !important;
+        width: 100%;
+    }
+
+    .modal-box {
+        width: 95%;
+        max-height: 92vh;
+        padding: 1.25rem;
+        border-radius: 12px;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .metric-card {
+        padding: 1rem;
+    }
+
+    .metric-details h3 {
+        font-size: 1.3rem;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+
+    table th, table td {
+        padding: 0.75rem 0.6rem;
+        font-size: 0.82rem;
+    }
+
+    .btn {
+        padding: 0.55rem 0.9rem;
+        font-size: 0.82rem;
+    }
+}
 
 /* --- Printable Receipt --- */
 @media print {
