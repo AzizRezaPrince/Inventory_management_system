@@ -6,7 +6,7 @@
 <div class="top-bar">
     <div>
         <h1 class="page-title">Admin Dashboard</h1>
-        <p class="page-subtitle">Welcome back, {{ session.get('fullname') }}! Real-time monthly overview, yearly growth & analytics.</p>
+        <p class="page-subtitle">Welcome back, {{ session.get('fullname') }}!</p>
     </div>
     <div>
         <a href="{{ url_for('sales') }}" class="btn btn-primary">
@@ -17,8 +17,9 @@
 
 <!-- SECTION 1: Monthly Overview & Yearly Growth Metrics -->
 <div style="margin-bottom: 2rem;">
-    <h2 style="font-size: 1.15rem; font-weight: 600; color: var(--text-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fa-solid fa-calendar-check" style="color: var(--accent-blue);"></i> Monthly Overview & Growth Metrics
+    <h2
+        style="font-size: 1.15rem; font-weight: 600; color: var(--text-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-calendar-check" style="color: var(--accent-blue);"></i> Monthly Overview & Growth
     </h2>
     <div class="metrics-grid">
         <div class="metric-card" style="border-left: 4px solid var(--accent-emerald);">
@@ -29,7 +30,8 @@
                 <h3>Tk {{ "%.2f"|format(monthly_total_profit) }}</h3>
                 <p>Monthly Net Profit</p>
                 <small style="color: var(--accent-emerald); font-weight: 600; font-size: 0.78rem;">
-                    <i class="fa-solid fa-calculator"></i> Earnings - Expenses (Tk {{ "%.2f"|format(monthly_total_expenses) }})
+                    <i class="fa-solid fa-calculator"></i> Earnings - Expenses (Tk {{
+                    "%.2f"|format(monthly_total_expenses) }})
                 </small>
             </div>
         </div>
@@ -123,7 +125,8 @@
     <div class="card-header-actions" style="margin-bottom: 1.25rem;">
         <div>
             <h2 class="card-title">
-                <i class="fa-solid fa-chart-area" style="color: var(--accent-blue);"></i> Monthly Overview & Yearly Revenue Growth ({{ curr_year }})
+                <i class="fa-solid fa-chart-area" style="color: var(--accent-blue);"></i> Monthly Overview & Yearly
+                Revenue Growth ({{ curr_year }})
             </h2>
             <p style="color: var(--text-muted); font-size: 0.825rem; margin-top: 0.25rem;">
                 Comparison of Monthly Sales Revenue, Repair Revenue, and Net Profit across the year.
@@ -152,7 +155,8 @@
     <div class="content-card" style="padding: 1.5rem;">
         <div class="card-header-actions" style="margin-bottom: 1rem;">
             <h2 class="card-title">
-                <i class="fa-solid fa-chart-pie" style="color: var(--accent-blue);"></i> Sales Revenue Breakdown (Pie Chart)
+                <i class="fa-solid fa-chart-pie" style="color: var(--accent-blue);"></i> Sales Revenue Breakdown (Pie
+                Chart)
             </h2>
         </div>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">
@@ -167,7 +171,8 @@
     <div class="content-card" style="padding: 1.5rem;">
         <div class="card-header-actions" style="margin-bottom: 1rem;">
             <h2 class="card-title">
-                <i class="fa-solid fa-chart-pie" style="color: var(--accent-purple);"></i> Repair Services Breakdown (Pie Chart)
+                <i class="fa-solid fa-chart-pie" style="color: var(--accent-purple);"></i> Repair Services Breakdown
+                (Pie Chart)
             </h2>
         </div>
         <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 1rem;">
@@ -184,7 +189,8 @@
     <!-- Active Repairs Summary -->
     <div class="content-card">
         <div class="card-header-actions">
-            <h2 class="card-title"><i class="fa-solid fa-screwdriver-wrench" style="color: var(--accent-purple);"></i> Recent Electronics Repairs</h2>
+            <h2 class="card-title"><i class="fa-solid fa-screwdriver-wrench" style="color: var(--accent-purple);"></i>
+                Recent Electronics Repairs</h2>
             <a href="{{ url_for('repairs') }}" class="btn btn-secondary btn-sm">View All</a>
         </div>
         <div class="table-responsive">
@@ -201,25 +207,27 @@
                     {% for r in active_repairs %}
                     <tr>
                         <td><strong>{{ r.id }}</strong></td>
-                        <td>{{ r.device_type }}<br><small style="color:var(--text-muted);">{{ r.brand_model }}</small></td>
+                        <td>{{ r.device_type }}<br><small style="color:var(--text-muted);">{{ r.brand_model }}</small>
+                        </td>
                         <td>
                             {% if r.status == 'Received' %}
-                                <span class="badge badge-received">Received</span>
+                            <span class="badge badge-received">Received</span>
                             {% elif r.status == 'Diagnosing' %}
-                                <span class="badge badge-diagnosing">Diagnosing</span>
+                            <span class="badge badge-diagnosing">Diagnosing</span>
                             {% elif r.status == 'In Progress' %}
-                                <span class="badge badge-in-progress">In Progress</span>
+                            <span class="badge badge-in-progress">In Progress</span>
                             {% elif r.status == 'Ready for Delivery' %}
-                                <span class="badge badge-ready">Ready</span>
+                            <span class="badge badge-ready">Ready</span>
                             {% else %}
-                                <span class="badge badge-delivered">{{ r.status }}</span>
+                            <span class="badge badge-delivered">{{ r.status }}</span>
                             {% endif %}
                         </td>
                         <td>Tk {{ "%.2f"|format(r.estimated_cost) }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="4" style="text-align: center; color: var(--text-muted);">No active repair jobs.</td>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted);">No active repair jobs.
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -230,7 +238,8 @@
     <!-- Low Stock Inventory Alert -->
     <div class="content-card">
         <div class="card-header-actions">
-            <h2 class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-amber);"></i> Low Stock Alerts (&lt; 5 Qty)</h2>
+            <h2 class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-amber);"></i>
+                Low Stock Alerts (&lt; 5 Qty)</h2>
             <a href="{{ url_for('products') }}" class="btn btn-secondary btn-sm">Manage Inventory</a>
         </div>
         <div class="table-responsive">
@@ -250,14 +259,16 @@
                         <td>{{ item.name }}</td>
                         <td>{{ item.brand }}</td>
                         <td>
-                            <span class="badge badge-diagnosing" style="background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border-color: rgba(244, 63, 94, 0.3);">
+                            <span class="badge badge-diagnosing"
+                                style="background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border-color: rgba(244, 63, 94, 0.3);">
                                 {{ item.quantity }} units left
                             </span>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="4" style="text-align: center; color: var(--accent-emerald);">All product stocks are healthy!</td>
+                        <td colspan="4" style="text-align: center; color: var(--accent-emerald);">All product stocks are
+                            healthy!</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -268,75 +279,75 @@
 
 <!-- SECTION 6: Chart.js Initialization Scripts -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Shared Theme Colors
-    const textColor = '#94a3b8';
-    const gridColor = 'rgba(255, 255, 255, 0.05)';
+    document.addEventListener('DOMContentLoaded', function () {
+        // Shared Theme Colors
+        const textColor = '#94a3b8';
+        const gridColor = 'rgba(255, 255, 255, 0.05)';
 
-    // 1. Monthly Overview & Yearly Growth Chart (Bar/Line)
-    const ctxTrend = document.getElementById('monthlyGrowthChart').getContext('2d');
-    new Chart(ctxTrend, {
-        type: 'bar',
-        data: {
-            labels: {{ months_labels|tojson }},
-            datasets: [
-                {
-                    label: 'Sales Revenue (Tk)',
-                    data: {{ monthly_sales_trend|tojson }},
-                    backgroundColor: 'rgba(56, 189, 248, 0.6)',
-                    borderColor: '#38bdf8',
-                    borderWidth: 2,
-                    borderRadius: 6
+        // 1. Monthly Overview & Yearly Growth Chart (Bar/Line)
+        const ctxTrend = document.getElementById('monthlyGrowthChart').getContext('2d');
+        new Chart(ctxTrend, {
+            type: 'bar',
+            data: {
+                labels: {{ months_labels| tojson }},
+        datasets: [
+        {
+            label: 'Sales Revenue (Tk)',
+            data: {{ monthly_sales_trend| tojson }},
+        backgroundColor: 'rgba(56, 189, 248, 0.6)',
+        borderColor: '#38bdf8',
+        borderWidth: 2,
+        borderRadius: 6
                 },
-                {
-                    label: 'Repair Revenue (Tk)',
-                    data: {{ monthly_repair_trend|tojson }},
-                    backgroundColor: 'rgba(168, 85, 247, 0.6)',
-                    borderColor: '#a855f7',
-                    borderWidth: 2,
-                    borderRadius: 6
+        {
+            label: 'Repair Revenue (Tk)',
+            data: {{ monthly_repair_trend| tojson }},
+        backgroundColor: 'rgba(168, 85, 247, 0.6)',
+        borderColor: '#a855f7',
+        borderWidth: 2,
+        borderRadius: 6
                 },
-                {
-                    label: 'Net Profit (Tk)',
-                    type: 'line',
-                    data: {{ monthly_profit_trend|tojson }},
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                    borderWidth: 3,
-                    tension: 0.3,
-                    fill: true,
-                    pointBackgroundColor: '#10b981',
-                    pointRadius: 4
+        {
+            label: 'Net Profit (Tk)',
+            type: 'line',
+            data: {{ monthly_profit_trend| tojson }},
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+        borderWidth: 3,
+        tension: 0.3,
+        fill: true,
+        pointBackgroundColor: '#10b981',
+        pointRadius: 4
                 }
-            ]
+    ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.dataset.label + ': Tk ' + context.raw.toLocaleString();
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    grid: { color: gridColor },
-                    ticks: { color: textColor }
-                },
-                y: {
-                    grid: { color: gridColor },
-                    ticks: {
-                        color: textColor,
-                        callback: function(val) { return 'Tk ' + val; }
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        return context.dataset.label + ': Tk ' + context.raw.toLocaleString();
                     }
                 }
             }
+        },
+        scales: {
+            x: {
+                grid: { color: gridColor },
+                ticks: { color: textColor }
+            },
+            y: {
+                grid: { color: gridColor },
+                ticks: {
+                    color: textColor,
+                    callback: function (val) { return 'Tk ' + val; }
+                }
+            }
         }
+    }
     });
 
     // 2. Sales Pie Chart (Separate)
@@ -344,37 +355,37 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(ctxSalesPie, {
         type: 'doughnut',
         data: {
-            labels: {{ sales_pie_labels|tojson }},
-            datasets: [{
-                data: {{ sales_pie_data|tojson }},
-                backgroundColor: [
-                    '#38bdf8',
-                    '#6366f1',
-                    '#10b981',
-                    '#f59e0b',
-                    '#f43f5e'
-                ],
-                borderWidth: 2,
-                borderColor: '#1e293b'
+            labels: {{ sales_pie_labels| tojson }},
+        datasets: [{
+            data: {{ sales_pie_data| tojson }},
+        backgroundColor: [
+            '#38bdf8',
+            '#6366f1',
+            '#10b981',
+            '#f59e0b',
+            '#f43f5e'
+        ],
+        borderWidth: 2,
+        borderColor: '#1e293b'
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: textColor, padding: 15, font: { size: 11 } }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': Tk ' + context.raw.toLocaleString();
-                        }
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { color: textColor, padding: 15, font: { size: 11 } }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        return context.label + ': Tk ' + context.raw.toLocaleString();
                     }
                 }
             }
         }
+    }
     });
 
     // 3. Repair Pie Chart (Separate)
@@ -382,37 +393,37 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(ctxRepairPie, {
         type: 'doughnut',
         data: {
-            labels: {{ repair_pie_labels|tojson }},
-            datasets: [{
-                data: {{ repair_pie_data|tojson }},
-                backgroundColor: [
-                    '#a855f7',
-                    '#38bdf8',
-                    '#f59e0b',
-                    '#10b981',
-                    '#f43f5e'
-                ],
-                borderWidth: 2,
-                borderColor: '#1e293b'
+            labels: {{ repair_pie_labels| tojson }},
+        datasets: [{
+            data: {{ repair_pie_data| tojson }},
+        backgroundColor: [
+            '#a855f7',
+            '#38bdf8',
+            '#f59e0b',
+            '#10b981',
+            '#f43f5e'
+        ],
+        borderWidth: 2,
+        borderColor: '#1e293b'
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: textColor, padding: 15, font: { size: 11 } }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.raw + ' Ticket(s)';
-                        }
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { color: textColor, padding: 15, font: { size: 11 } }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        return context.label + ': ' + context.raw + ' Ticket(s)';
                     }
                 }
             }
         }
+    }
     });
 });
 </script>
