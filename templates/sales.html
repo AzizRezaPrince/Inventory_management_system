@@ -5,16 +5,15 @@
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title"><i class="fa-solid fa-cart-shopping" style="color: var(--accent-emerald);"></i> Sales &
-            Customer Payment</h1>
-        <!--<p class="page-subtitle">Process quick product sales, custom pricing, customer paid/due tracking, and EMI installment plans.</p>-->
+        <h1 class="page-title" data-i18n="sales_title"><i class="fa-solid fa-cart-shopping" style="color: var(--accent-emerald);"></i> Sales & Customer Payment</h1>
     </div>
     <div>
         <button class="btn btn-primary" onclick="openModal('addSaleModal'); updateLiveSalePrice();">
-            <i class="fa-solid fa-cart-plus"></i> Process New Sale
+            <i class="fa-solid fa-cart-plus"></i> <span data-i18n="sales_new">Process New Sale</span>
         </button>
     </div>
 </div>
+
 
 <!-- Sales Financial & Dues Summary Metrics -->
 <div class="metrics-grid" style="margin-bottom: 2rem;">

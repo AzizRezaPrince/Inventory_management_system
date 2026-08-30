@@ -4,14 +4,22 @@
 
 {% block login_content %}
 <div
-    style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+    style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative;">
+    
+    <div style="position: absolute; top: 1rem; right: 1rem;">
+        <button class="lang-toggle-btn" onclick="toggleLanguage()" style="padding: 4px 10px; font-size: 0.8rem;">
+            <i class="fa-solid fa-globe"></i>
+            <span class="lang-btn-text">বাংলা</span>
+        </button>
+    </div>
+
     <div style="text-align: center; margin-bottom: 2rem;">
         <div
             style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue)); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #fff; margin-bottom: 1rem;">
             <i class="fa-solid fa-microchip"></i>
         </div>
-        <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">SS Technology</h2>
-        <!--<p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;"> </p>-->
+        <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">{{ shop_settings.shop_name }}</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">{{ shop_settings.shop_tagline }}</p>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -26,19 +34,19 @@
 
     <form action="{{ url_for('login') }}" method="POST">
         <div class="form-group">
-            <label class="form-label"><i class="fa-solid fa-user"></i> Username</label>
-            <input type="text" name="username" class="form-control" placeholder="Enter your username" required
+            <label class="form-label"><i class="fa-solid fa-user"></i> <span data-i18n="user_username">Username</span></label>
+            <input type="text" name="username" class="form-control" placeholder="Enter username" data-i18n-ph="user_username" required
                 autofocus>
         </div>
 
         <div class="form-group" style="margin-bottom: 1.75rem;">
-            <label class="form-label"><i class="fa-solid fa-lock"></i> Password</label>
-            <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+            <label class="form-label"><i class="fa-solid fa-lock"></i> <span data-i18n="user_password">Password</span></label>
+            <input type="password" name="password" class="form-control" placeholder="Enter password" data-i18n-ph="user_password" required>
         </div>
 
         <button type="submit" class="btn btn-primary"
             style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem;">
-            Sign In <i class="fa-solid fa-arrow-right"></i>
+            <span data-i18n="btn_login">Sign In to IMS Workspace</span> <i class="fa-solid fa-arrow-right"></i>
         </button>
     </form>
 </div>

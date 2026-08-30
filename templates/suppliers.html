@@ -5,16 +5,15 @@
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title"><i class="fa-solid fa-truck-field" style="color: var(--accent-blue);"></i> Supplier
-            Directory & Accounts</h1>
-        <!-- <p class="page-subtitle">Auto-synced suppliers from stock purchases, contact info, purchase history, and supplier due balances.</p> -->
+        <h1 class="page-title" data-i18n="sup_title"><i class="fa-solid fa-truck-field" style="color: var(--accent-blue);"></i> Suppliers</h1>
     </div>
     <div>
         <button class="btn btn-primary" onclick="openModal('addSupplierModal')">
-            <i class="fa-solid fa-plus"></i> Add New Supplier
+            <i class="fa-solid fa-plus"></i> <span data-i18n="sup_add">Add New Supplier</span>
         </button>
     </div>
 </div>
+
 
 <!-- Supplier Metrics Cards -->
 <div class="metrics-grid" style="margin-bottom: 2rem;">

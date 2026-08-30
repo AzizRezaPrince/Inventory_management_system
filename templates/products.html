@@ -5,20 +5,20 @@
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">Product Inventory & Stock</h1>
+        <h1 class="page-title" data-i18n="prod_title">Product Inventory Workspace</h1>
     </div>
     <div>
         <button class="btn btn-primary" onclick="openModal('addProductModal'); updateAutoProductCode();">
-            <i class="fa-solid fa-plus"></i> Add Product Item
+            <i class="fa-solid fa-plus"></i> <span data-i18n="prod_add_new">Register New Product Item</span>
         </button>
     </div>
 </div>
 
 <div class="content-card">
     <div class="card-header-actions">
-        <input type="text" id="productSearch" class="form-control" placeholder="Search products by code, name, category or brand..." style="max-width: 380px;" onkeyup="filterTable('productSearch', 'productsTable')">
+        <input type="text" id="productSearch" class="form-control" placeholder="Search products..." style="max-width: 380px;" onkeyup="filterTable('productSearch', 'productsTable')">
         <div>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Total Products: <strong>{{ products|length }}</strong></span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);"><span data-i18n="dash_total_products">Total Products</span>: <strong>{{ products|length }}</strong></span>
         </div>
     </div>
 
@@ -26,17 +26,18 @@
         <table id="productsTable">
             <thead>
                 <tr>
-                    <th>Product Code</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Brand</th>
-                    <th>Cost Price (Tk)</th>
-                    <th>Selling Price (Tk)</th>
-                    <th>In Stock Qty</th>
-                    <th>Actions</th>
+                    <th data-i18n="prod_code">Product Code</th>
+                    <th data-i18n="prod_name">Product Name</th>
+                    <th data-i18n="prod_category">Category</th>
+                    <th data-i18n="prod_brand">Brand</th>
+                    <th data-i18n="prod_cost">Cost Price (Tk)</th>
+                    <th data-i18n="prod_sell">Selling Price (Tk)</th>
+                    <th data-i18n="prod_stock">In Stock Qty</th>
+                    <th data-i18n="prod_actions">Actions</th>
                 </tr>
             </thead>
             <tbody>
+
                 {% for p in products %}
                 <tr>
                     <td><code>{{ p.productcode }}</code></td>

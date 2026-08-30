@@ -5,20 +5,20 @@
 {% block content %}
 <div class="top-bar">
     <div>
-        <h1 class="page-title">Electronics Repair & Service</h1>
+        <h1 class="page-title" data-i18n="repair_title">Electronics Repair & Service Workspace</h1>
     </div>
     <div>
         <button class="btn btn-primary" onclick="openModal('addRepairModal')">
-            <i class="fa-solid fa-plus"></i> Add New Service
+            <i class="fa-solid fa-plus"></i> <span data-i18n="repair_new_ticket">Create New Repair Service Ticket</span>
         </button>
     </div>
 </div>
 
 <div class="content-card">
     <div class="card-header-actions">
-        <input type="text" id="repairSearch" class="form-control" placeholder="Search Service by ID, customer name, device or phone..." style="max-width: 380px;" onkeyup="filterTable('repairSearch', 'repairsTable')">
+        <input type="text" id="repairSearch" class="form-control" placeholder="Search Service..." style="max-width: 380px;" onkeyup="filterTable('repairSearch', 'repairsTable')">
         <div>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Total Service: <strong>{{ repairs|length }}</strong></span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);"><span data-i18n="repair_title">Total Service</span>: <strong>{{ repairs|length }}</strong></span>
         </div>
     </div>
 
@@ -26,17 +26,18 @@
         <table id="repairsTable">
             <thead>
                 <tr>
-                    <th>Service ID</th>
-                    <th>Customer & Contact</th>
-                    <th>Device & Issue</th>
-                    <th>Est. Cost</th>
-                    <th>Paid / Balance Due</th>
-                    <th>Status</th>
-                    <th>Est. Delivery</th>
-                    <th>Actions</th>
+                    <th data-i18n="repair_ticket_id">Ticket ID</th>
+                    <th data-i18n="repair_customer">Customer Name</th>
+                    <th data-i18n="repair_device">Device Type</th>
+                    <th data-i18n="repair_est_cost">Est. Cost</th>
+                    <th data-i18n="sales_due">Due Amount</th>
+                    <th data-i18n="repair_status">Status</th>
+                    <th data-i18n="repair_delivery_date">Est. Delivery Date</th>
+                    <th data-i18n="prod_actions">Actions</th>
                 </tr>
             </thead>
             <tbody>
+
                 {% for r in repairs %}
                     {% set balance = r.estimated_cost - r.advance_paid %}
                     {% set due_color = 'var(--accent-rose)' if balance > 0 else 'var(--accent-emerald)' %}

@@ -1,6 +1,58 @@
-document.addEventListener('DOMContentLoaded', () => {
-    console.log(" ");
+// --- Bilingual English <-> Bangla (বাংলা) Language Engine ---
+function getAppLanguage() {
+    return localStorage.getItem('app_lang') || 'en';
+}
 
+function setAppLanguage(lang) {
+    localStorage.setItem('app_lang', lang);
+    document.cookie = `app_lang=${lang}; path=/; max-age=31536000`;
+    applyLanguage(lang);
+}
+
+function toggleLanguage() {
+    const currentLang = getAppLanguage();
+    const newLang = currentLang === 'en' ? 'bn' : 'en';
+    setAppLanguage(newLang);
+}
+
+function applyLanguage(lang) {
+    if (typeof TRANSLATIONS === 'undefined' || !TRANSLATIONS[lang]) return;
+    const dict = TRANSLATIONS[lang];
+
+    // Translate all elements with data-i18n
+    const elements = document.querySelectorAll('[data-i18n]');
+    elements.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    // Translate placeholder attributes with data-i18n-ph
+    const phElements = document.querySelectorAll('[data-i18n-ph]');
+    phElements.forEach(el => {
+        const key = el.getAttribute('data-i18n-ph');
+        if (dict[key]) {
+            el.placeholder = dict[key];
+        }
+    });
+
+    // Update toggle button text
+    const btnLabels = document.querySelectorAll('.lang-btn-text');
+    btnLabels.forEach(lbl => {
+        lbl.textContent = lang === 'en' ? 'বাংলা' : 'English';
+    });
+
+    const activeBadges = document.querySelectorAll('.lang-active-badge');
+    activeBadges.forEach(badge => {
+        badge.textContent = lang === 'en' ? 'EN' : 'BN';
+    });
+
+    // Update html lang attribute
+    document.documentElement.lang = lang;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     // Flash Alert Dismissal
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
@@ -10,6 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => alert.remove(), 500);
         }, 5000);
     });
+
+    // Apply Language
+    applyLanguage(getAppLanguage());
 });
 
 // Modal Helper Functions
