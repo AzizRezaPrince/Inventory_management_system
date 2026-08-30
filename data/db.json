@@ -9,7 +9,7 @@
     "users": [
         {
             "id": "54",
-            "fullname": "Shawon Sarwar",
+            "fullname": "Abdul Wadud",
             "location": "Chapainawabganj",
             "phone": "01700000000",
             "username": "admin",
@@ -25,5 +25,16 @@
     "salesreport": [],
     "repairs": [],
     "expenses": [],
-    "activity_logs": []
+    "activity_logs": [
+        {
+            "date": "2026-08-30 03:54:51",
+            "user": "Abdul Wadud",
+            "user_role": "ADMINISTRATOR",
+            "action_type": "LOGIN",
+            "title": "User Signed In",
+            "description": "Abdul Wadud (ADMINISTRATOR) logged in successfully.",
+            "target_ref": "",
+            "id": "1788040491796"
+        }
+    ]
 }

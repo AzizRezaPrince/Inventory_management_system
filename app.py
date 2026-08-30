@@ -26,11 +26,16 @@ if os.path.exists(_legacy_lib):
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'electronics_shop_ims_secret_2026')
 
-# --- Context Processor for Global Shop Settings ---
+# --- Context Processor for Global Shop Settings & Database Status ---
 @app.context_processor
 def inject_global_settings():
     settings = db.get_settings()
-    return dict(shop_settings=settings)
+    db_status = {
+        'use_firebase': db.use_firebase,
+        'project_id': db.project_id,
+        'mode': 'Cloud Firebase Firestore' if db.use_firebase else 'Local NoSQL Engine'
+    }
+    return dict(shop_settings=settings, db_status=db_status)
 
 # --- Authentication Decorators ---
 def login_required(f):
@@ -380,6 +385,16 @@ def settings():
             session['fullname'] = fullname
             session['username'] = username
             flash('Your profile and login information have been updated!', 'success')
+
+        elif action == 'sync_firebase':
+            if session.get('category') != 'ADMINISTRATOR':
+                flash('Only Administrators can trigger database sync to Firebase.', 'danger')
+            else:
+                success, msg = db.sync_all_to_firebase()
+                if success:
+                    flash(msg, 'success')
+                else:
+                    flash(msg, 'warning')
 
         return redirect(url_for('settings'))
 
